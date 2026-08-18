@@ -8,6 +8,7 @@ import { Label, Input, Textarea, Select } from "@/components/ui/Field";
 import { Card, CardContent } from "@/components/ui/Card";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { CategoryChoicePicker } from "@/components/renovate/CategoryChoicePicker";
+import { InlineAuthStep } from "@/components/renovate/InlineAuthStep";
 import { RENOVATION_CHOICE_CATEGORIES, composeDescription } from "@/lib/renovationChoices";
 import type { RenovationStyle } from "@/lib/types";
 
@@ -22,7 +23,7 @@ const STYLES: { value: RenovationStyle; label: string }[] = [
   { value: "free", label: "Libre" },
 ];
 
-type Step = "photo" | "description" | "generating";
+type Step = "photo" | "description" | "auth" | "generating";
 
 export function CreateProjectFlow() {
   const router = useRouter();
@@ -70,7 +71,7 @@ export function CreateProjectFlow() {
     setPreviewUrl(URL.createObjectURL(selected));
   }
 
-  async function handleSubmit() {
+  async function handleGenerateClick() {
     if (!file) {
       setError("Ajoutez une photo pour continuer.");
       return;
@@ -80,6 +81,25 @@ export function CreateProjectFlow() {
       return;
     }
 
+    setError(null);
+
+    // Gate right before generating the result — not earlier — so people can
+    // fill in the whole form first. Their photo and choices stay in memory,
+    // nothing is lost while they sign in.
+    const supabase = createSupabaseBrowserClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      setStep("auth");
+      return;
+    }
+
+    await runGeneration();
+  }
+
+  async function runGeneration() {
     setError(null);
     setStep("generating");
 
@@ -91,7 +111,7 @@ export function CreateProjectFlow() {
       } = await supabase.auth.getUser();
 
       const formData = new FormData();
-      formData.append("photo", file);
+      formData.append("photo", file!);
       formData.append("name", name || "Mon projet de rénovation");
       if (user) formData.append("userId", user.id);
 
@@ -123,6 +143,10 @@ export function CreateProjectFlow() {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
       setStep("description");
     }
+  }
+
+  if (step === "auth") {
+    return <InlineAuthStep onAuthenticated={runGeneration} />;
   }
 
   if (step === "generating") {
@@ -260,7 +284,7 @@ export function CreateProjectFlow() {
         <p className="text-sm text-danger bg-danger-soft rounded-[var(--radius-button)] px-3 py-2">{error}</p>
       )}
 
-      <Button size="lg" className="w-full" onClick={handleSubmit}>
+      <Button size="lg" className="w-full" onClick={handleGenerateClick}>
         Générer mon projet
       </Button>
     </div>

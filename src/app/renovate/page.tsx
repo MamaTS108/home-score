@@ -1,18 +1,7 @@
-import { redirect } from "next/navigation";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { CreateProjectFlow } from "@/components/renovate/CreateProjectFlow";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export default async function RenovatePage() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login?next=/renovate");
-  }
-
+export default function RenovatePage() {
   return (
     <>
       <SiteHeader />
