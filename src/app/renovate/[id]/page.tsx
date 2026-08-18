@@ -4,7 +4,6 @@ import Image from "next/image";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ProjectNav } from "@/components/renovate/ProjectNav";
 import { IterationChat } from "@/components/renovate/IterationChat";
-import { HomeScoreCard } from "@/components/renovate/HomeScoreCard";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { getProjectDetail } from "@/lib/data/getProjectDetail";
@@ -15,7 +14,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   const detail = await getProjectDetail(id);
   if (!detail) notFound();
 
-  const { project, analysis, plan, homeScore, messages, designs } = detail;
+  const { project, analysis, plan, messages, designs } = detail;
   const latestDesign = designs[designs.length - 1];
 
   return (
@@ -130,8 +129,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                 <InfoRow label="Statut" value={project.status} />
               </CardContent>
             </Card>
-
-            {homeScore && <HomeScoreCard score={homeScore} />}
           </div>
         </div>
       </main>

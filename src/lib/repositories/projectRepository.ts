@@ -1,6 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { computeBudgetSummary } from "@/lib/budget/budgetEngine";
-import { computeHomeScore } from "@/lib/homeScore";
 import type {
   AiMessage,
   DesignGeneration,
@@ -281,7 +280,8 @@ export class ProjectRepository {
     }
 
     const budgetSummary = productBudget ? computeBudgetSummary(productBudget, project.budgetMax) : null;
-    const homeScore = analysis && plan ? computeHomeScore(analysis, plan, budgetSummary) : null;
+    // Home Score is paused for now (energy scoring not enabled yet).
+    const homeScore = null;
 
     return {
       project,
