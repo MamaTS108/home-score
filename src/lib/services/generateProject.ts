@@ -42,11 +42,13 @@ export async function runFullGeneration(
   await repo.saveProductBudget(projectId, productBudget);
 
   const prompt = generateRenovationPrompt(analysis, brief, plan);
-  const designProvider = getDesignProvider();
+  const designProvider = getDesignProvider(supabase);
   const design = await designProvider.generate({
     projectId,
     prompt,
     sourceImageUrl: originalImageUrl,
+    sourceImageBase64: imageBase64,
+    sourceImageMediaType: imageMediaType,
     version: nextVersion,
   });
   await repo.saveDesign(design);
