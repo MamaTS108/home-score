@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -14,7 +15,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   const detail = await getProjectDetail(id);
   if (!detail) notFound();
 
-  const { project, analysis, plan, homeScore, messages } = detail;
+  const { project, analysis, plan, homeScore, messages, designs } = detail;
+  const latestDesign = designs[designs.length - 1];
 
   return (
     <>
@@ -26,11 +28,33 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <Card className="overflow-hidden">
-              <div className="relative aspect-video">
-                <Image src={project.originalImageUrl} alt={project.name} fill className="object-cover" unoptimized />
-              </div>
+              {latestDesign ? (
+                <div className="grid grid-cols-2">
+                  <div className="relative aspect-video">
+                    <Image src={project.originalImageUrl} alt="Avant" fill className="object-cover" unoptimized />
+                    <Badge tone="muted" className="absolute top-2 left-2 bg-surface/90">
+                      Avant
+                    </Badge>
+                  </div>
+                  <div className="relative aspect-video">
+                    <Image src={latestDesign.imageUrl} alt="Après" fill className="object-cover" unoptimized />
+                    <Badge tone="accent" className="absolute top-2 left-2">
+                      Après — IA
+                    </Badge>
+                  </div>
+                </div>
+              ) : (
+                <div className="relative aspect-video">
+                  <Image src={project.originalImageUrl} alt={project.name} fill className="object-cover" unoptimized />
+                </div>
+              )}
               <CardContent>
                 <p className="text-sm text-muted-foreground">{project.description}</p>
+                {latestDesign && (
+                  <Link href={`/renovate/${id}/design`} className="text-xs text-accent font-medium mt-2 inline-block">
+                    Voir en grand →
+                  </Link>
+                )}
               </CardContent>
             </Card>
 

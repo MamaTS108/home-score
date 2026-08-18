@@ -53,3 +53,14 @@ export const MOCK_CATALOG: CatalogProduct[] = [
 ];
 
 export const ACCESSORY_CATEGORIES = new Set(["accessoires", "décoration", "éclairage"]);
+
+/**
+ * The exact, closed set of category strings that exist in the catalog.
+ * The renovation plan (LLM output) is constrained to only use these values
+ * for `requiredMaterialCategories` — otherwise free-text categories like
+ * "cuisine", "meubles cuisine", "électroménager cuisine" all fuzzy-match the
+ * same first catalog product and produce confusing duplicate line items.
+ */
+export const ALLOWED_MATERIAL_CATEGORIES = Array.from(
+  new Set(MOCK_CATALOG.map((p) => p.category))
+).sort();

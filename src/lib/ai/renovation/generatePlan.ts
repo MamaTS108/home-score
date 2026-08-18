@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 import { callClaudeForJson } from "@/lib/ai/client";
+import { ALLOWED_MATERIAL_CATEGORIES } from "@/lib/products/catalog";
 import type { DifficultyLevel, ProjectBrief, RenovationPlan, RoomAnalysis } from "@/lib/types";
 
 const SYSTEM_PROMPT = `Tu es un assistant de planification de travaux de rénovation intérieure pour particuliers.
@@ -10,6 +11,9 @@ RÈGLES STRICTES :
 - Garde chaque description de travail concise (1 à 2 phrases maximum). Ne développe pas de longues explications.
 - N'affirme JAMAIS qu'un travail nécessite obligatoirement un professionnel, SAUF s'il s'agit manifestement d'une opération réglementée ou dangereuse (électricité, gaz, plomberie lourde, structure porteuse, amiante).
 - Tu ne donnes AUCUN prix. Les prix sont calculés séparément par le backend.
+- IMPORTANT — "requiredMaterialCategories" DOIT UNIQUEMENT contenir des valeurs EXACTES parmi cette liste fermée (jamais d'autre texte, jamais de variante) :
+${ALLOWED_MATERIAL_CATEGORIES.map((c) => `  - "${c}"`).join("\n")}
+  N'invente pas de nouvelle catégorie (ex: n'écris jamais "meubles cuisine", "électroménager", "luminaires salon" — utilise "cuisine" ou "éclairage" tels quels). Chaque catégorie ne doit apparaître qu'une seule fois dans le tableau.
 - Réponds UNIQUEMENT avec un JSON valide, sans texte avant/après, sans balises markdown.
 
 Format de réponse JSON attendu :
@@ -26,7 +30,7 @@ Format de réponse JSON attendu :
       "requiresProfessional": boolean
     }
   ],
-  "requiredMaterialCategories": string[] (catégories de matériaux nécessaires, ex: "peinture murale", "sol", "plinthes", "rangement", "accessoires")
+  "requiredMaterialCategories": string[] (valeurs exclusivement issues de la liste fermée ci-dessus)
 }`;
 
 interface RawPlanResult {
@@ -72,10 +76,24 @@ export async function generatePlan(
       requiresProfessional: task.requiresProfessional,
       order: index,
     })),
-    requiredMaterialCategories: raw.requiredMaterialCategories ?? [],
+    requiredMaterialCategories: sanitizeCategories(raw.requiredMaterialCategories),
     createdAt: new Date().toISOString(),
     version,
   };
+}
+
+/** Safety net: drops any category the model might still hallucinate outside the closed list, and dedupes. */
+function sanitizeCategories(categories: string[] | null | undefined): string[] {
+  const allowed = new Set(ALLOWED_MATERIAL_CATEGORIES);
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const category of categories ?? []) {
+    if (allowed.has(category) && !seen.has(category)) {
+      seen.add(category);
+      result.push(category);
+    }
+  }
+  return result;
 }
 
 function buildUserPrompt(analysis: RoomAnalysis, brief: ProjectBrief): string {
