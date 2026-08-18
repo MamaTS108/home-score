@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HOME SCORE — Imaginez-le. Planifiez-le. Budgétez-le.",
+  title: "HOME SCORE : Imaginez-le. Planifiez-le. Budgétez-le.",
   description:
     "Prenez une photo de votre pièce, décrivez votre projet, et obtenez une visualisation IA, la liste des travaux, des matériaux et une estimation de budget.",
 };

@@ -3,6 +3,8 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { ProjectRepository } from "@/lib/repositories/projectRepository";
 import { getDesignProvider } from "@/lib/ai/design/generateDesign";
 import { generateRenovationPrompt } from "@/lib/ai/design/generateRenovationPrompt";
+
+export const maxDuration = 60;
 import { fetchImageAsBase64, errorMessage } from "@/lib/utils";
 import { AiConfigError } from "@/lib/ai/client";
 

@@ -3,6 +3,10 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { ProjectRepository } from "@/lib/repositories/projectRepository";
 import { runFullGeneration } from "@/lib/services/generateProject";
 import { fetchImageAsBase64, errorMessage } from "@/lib/utils";
+
+// Vision analysis + plan + design generation run sequentially and can
+// exceed Vercel's default 10s function timeout on the Hobby plan.
+export const maxDuration = 60;
 import { AiConfigError } from "@/lib/ai/client";
 
 /**

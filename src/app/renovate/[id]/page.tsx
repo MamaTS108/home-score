@@ -39,7 +39,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                   <div className="relative aspect-video">
                     <Image src={latestDesign.imageUrl} alt="Après" fill className="object-cover" unoptimized />
                     <Badge tone="accent" className="absolute top-2 left-2">
-                      Après — IA
+                      Après : IA
                     </Badge>
                   </div>
                 </div>
@@ -63,7 +63,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                 <CardHeader>
                   <h2 className="font-semibold">Analyse de la pièce</h2>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Estimations basées sur la photo — jamais des mesures exactes.
+                    Estimations basées sur la photo, jamais des mesures exactes.
                   </p>
                 </CardHeader>
                 <CardContent className="grid sm:grid-cols-2 gap-4 text-sm">

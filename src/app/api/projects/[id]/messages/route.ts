@@ -3,6 +3,11 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { ProjectRepository } from "@/lib/repositories/projectRepository";
 import { iterateOnProject } from "@/lib/ai/assistant/renovationAssistant";
 import { runFullGeneration } from "@/lib/services/generateProject";
+
+// The assistant reply is fast, but when it triggers a full regeneration
+// (e.g. "Optimize my project") this can exceed Vercel's default 10s
+// function timeout on the Hobby plan.
+export const maxDuration = 60;
 import { fetchImageAsBase64, errorMessage } from "@/lib/utils";
 import { AiConfigError } from "@/lib/ai/client";
 

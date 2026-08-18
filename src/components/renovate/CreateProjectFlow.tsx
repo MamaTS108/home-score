@@ -36,6 +36,7 @@ export function CreateProjectFlow() {
   const [promptText, setPromptText] = useState("");
   const [style, setStyle] = useState<RenovationStyle>("free");
   const [budgetMax, setBudgetMax] = useState("");
+  const [areaM2, setAreaM2] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loadingLabel, setLoadingLabel] = useState("Analyse de votre pièce...");
   const lastAutoTextRef = useRef("");
@@ -47,10 +48,12 @@ export function CreateProjectFlow() {
   // their own edits into the box, further chip selections stop overwriting
   // it — their manual edits always win once made.
   useEffect(() => {
-    const autoText = composeDescription(selections, "");
-    setPromptText((current) => (current === lastAutoTextRef.current ? autoText : current));
+    const base = composeDescription(selections, "");
+    const autoText = areaM2.trim() ? `${base} Surface approximative de la pièce : ${areaM2.trim()} m².`.trim() : base;
+    const previousAutoText = lastAutoTextRef.current;
+    setPromptText((current) => (current === previousAutoText ? autoText : current));
     lastAutoTextRef.current = autoText;
-  }, [selections]);
+  }, [selections, areaM2]);
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const selected = event.target.files?.[0];
@@ -129,7 +132,7 @@ export function CreateProjectFlow() {
           <div className="mx-auto mb-6 h-10 w-10 rounded-full border-2 border-accent border-t-transparent animate-spin" />
           <p className="font-medium">{loadingLabel}</p>
           <p className="text-sm text-muted-foreground mt-2">
-            Cela peut prendre quelques instants — analyse, plan de travaux, matériaux et budget.
+            Cela peut prendre quelques instants : analyse, plan de travaux, matériaux et budget.
           </p>
         </CardContent>
       </Card>
@@ -216,7 +219,7 @@ export function CreateProjectFlow() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div>
               <Label htmlFor="style">Style (optionnel)</Label>
               <Select id="style" value={style} onChange={(e) => setStyle(e.target.value as RenovationStyle)}>
@@ -236,6 +239,17 @@ export function CreateProjectFlow() {
                 placeholder="5000"
                 value={budgetMax}
                 onChange={(e) => setBudgetMax(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="area">Surface (m², optionnel)</Label>
+              <Input
+                id="area"
+                type="number"
+                min={0}
+                placeholder="15"
+                value={areaM2}
+                onChange={(e) => setAreaM2(e.target.value)}
               />
             </div>
           </div>
