@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Label, Input, Textarea, Select } from "@/components/ui/Field";
@@ -33,14 +33,24 @@ export function CreateProjectFlow() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [name, setName] = useState("Mon projet de rénovation");
   const [selections, setSelections] = useState<Record<string, string | null>>({});
-  const [notes, setNotes] = useState("");
+  const [promptText, setPromptText] = useState("");
   const [style, setStyle] = useState<RenovationStyle>("free");
   const [budgetMax, setBudgetMax] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loadingLabel, setLoadingLabel] = useState("Analyse de votre pièce...");
+  const lastAutoTextRef = useRef("");
 
-  const description = composeDescription(selections, notes);
   const hasAnySelection = Object.values(selections).some((v) => v !== null && v !== undefined);
+  const description = promptText;
+
+  // Live-fills the prompt box as choices are made. If the person has typed
+  // their own edits into the box, further chip selections stop overwriting
+  // it — their manual edits always win once made.
+  useEffect(() => {
+    const autoText = composeDescription(selections, "");
+    setPromptText((current) => (current === lastAutoTextRef.current ? autoText : current));
+    lastAutoTextRef.current = autoText;
+  }, [selections]);
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const selected = event.target.files?.[0];
@@ -62,7 +72,7 @@ export function CreateProjectFlow() {
       setError("Ajoutez une photo pour continuer.");
       return;
     }
-    if (!hasAnySelection && !notes.trim()) {
+    if (!hasAnySelection && !promptText.trim()) {
       setError("Choisissez au moins un élément à changer, ou décrivez votre projet.");
       return;
     }
@@ -192,14 +202,18 @@ export function CreateProjectFlow() {
           </div>
 
           <div>
-            <Label htmlFor="notes">Précisions supplémentaires (optionnel)</Label>
+            <Label htmlFor="promptText">Votre demande (se remplit automatiquement, modifiable)</Label>
             <Textarea
-              id="notes"
-              rows={3}
-              placeholder="Ex : garder la cheminée, ajouter un îlot central si la place le permet..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              id="promptText"
+              rows={4}
+              placeholder="Sélectionnez des options ci-dessus, ou décrivez directement votre projet ici..."
+              value={promptText}
+              onChange={(e) => setPromptText(e.target.value)}
             />
+            <p className="text-xs text-muted-foreground mt-1">
+              Cette zone se remplit selon vos choix ci-dessus. Vous pouvez aussi la modifier ou compléter
+              librement (ex : garder la cheminée, ajouter un îlot central...).
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -227,15 +241,6 @@ export function CreateProjectFlow() {
           </div>
         </CardContent>
       </Card>
-
-      {description && (
-        <Card className="bg-accent-soft border-none">
-          <CardContent className="py-3">
-            <p className="text-xs text-muted-foreground mb-1">Aperçu de votre demande</p>
-            <p className="text-sm text-foreground">{description}</p>
-          </CardContent>
-        </Card>
-      )}
 
       {error && (
         <p className="text-sm text-danger bg-danger-soft rounded-[var(--radius-button)] px-3 py-2">{error}</p>
