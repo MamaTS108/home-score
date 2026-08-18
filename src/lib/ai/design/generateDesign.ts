@@ -7,7 +7,7 @@ import { uploadRenderImage } from "@/lib/supabase/storage";
 const AI_DISCLAIMER =
   "Visualisation IA — le résultat final peut différer de la réalisation.";
 
-const GEMINI_IMAGE_MODEL = "gemini-2.5-flash-image";
+const GEMINI_IMAGE_MODEL = "gemini-3.1-flash-lite-image";
 
 export interface GenerateDesignInput {
   projectId: string;
@@ -18,30 +18,11 @@ export interface GenerateDesignInput {
   version: number;
 }
 
-/**
- * A DesignProvider turns a prompt + source photo into a rendered "after" image.
- *
- * The MVP ships a StubDesignProvider (no real image-generation backend wired
- * in yet — see the spec: the MVP must not fake a capability it doesn't have).
- * To go live, implement this interface against a real provider (e.g. Gemini
- * image generation, fal.ai, Replicate...) and swap it in `getDesignProvider()`
- * below — nothing else in the app needs to change.
- */
 export interface DesignProvider {
   readonly name: string;
   generate(input: GenerateDesignInput): Promise<DesignGeneration>;
 }
 
-/**
- * MVP stub: does NOT call any image-generation model. It returns the original
- * photo annotated as a placeholder so the rest of the product (tasks,
- * materials, budget, iteration) can be fully exercised end-to-end while a
- * real image-generation integration is added.
- *
- * IMPORTANT: this must stay honest in the UI — always label the result as a
- * placeholder, never as a finished AI rendering, unless a real provider is
- * configured.
- */
 export class StubDesignProvider implements DesignProvider {
   readonly name = "stub";
 
@@ -50,7 +31,6 @@ export class StubDesignProvider implements DesignProvider {
       id: randomUUID(),
       projectId: input.projectId,
       prompt: input.prompt,
-      // No image model wired in yet: MVP shows the original photo.
       imageUrl: input.sourceImageUrl,
       sourceImageUrl: input.sourceImageUrl,
       version: input.version,
@@ -61,17 +41,13 @@ export class StubDesignProvider implements DesignProvider {
 }
 
 /**
- * Real image-generation backend: Google Gemini 2.5 Flash Image, in
- * image-editing mode (source photo + instruction in, edited photo out).
- * This is what keeps the same room, walls and windows while only changing
- * the finishes (spec section 5) — an instruction-based edit of the real
- * photo, not a from-scratch text-to-image generation.
- *
- * Requires GEMINI_API_KEY. Needs the source photo's bytes (not just its
- * URL), since Gemini takes the image as input alongside the text prompt.
+ * Requires GEMINI_API_KEY, AND that key's Google Cloud project ("Default
+ * Gemini Project" by default) must have a real billing account linked with
+ * prepaid credit — a free-trial billing account does not unlock image
+ * generation. Check status at https://ai.studio/projects.
  */
 export class GeminiDesignProvider implements DesignProvider {
-  readonly name = "gemini-2.5-flash-image";
+  readonly name = "gemini-3.1-flash-lite-image";
   private client: GoogleGenAI;
   private supabase: SupabaseClient;
 
@@ -92,9 +68,6 @@ export class GeminiDesignProvider implements DesignProvider {
       throw new Error("GeminiDesignProvider requires the source image bytes (sourceImageBase64).");
     }
 
-    // input.prompt is already the full SYSTEM CONSTRAINTS + ROOM ANALYSIS +
-    // USER REQUEST + BUDGET + STYLE prompt built by generateRenovationPrompt.
-    // The user's free text is never sent to the model on its own.
     const response = await this.client.models.generateContent({
       model: GEMINI_IMAGE_MODEL,
       contents: [
@@ -139,8 +112,6 @@ export class GeminiDesignProvider implements DesignProvider {
 }
 
 export function getDesignProvider(supabase: SupabaseClient): DesignProvider {
-  // Uses Gemini 2.5 Flash Image when GEMINI_API_KEY is configured, and falls
-  // back to the honest placeholder stub otherwise — never fakes a render.
   if (process.env.GEMINI_API_KEY) {
     return new GeminiDesignProvider(supabase);
   }
