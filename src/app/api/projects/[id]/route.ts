@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { ProjectRepository } from "@/lib/repositories/projectRepository";
+import { errorMessage } from "@/lib/utils";
 import type { RenovationStyle } from "@/lib/types";
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -46,8 +47,4 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     console.error("PATCH /api/projects/[id] failed", error);
     return NextResponse.json({ error: errorMessage(error) }, { status: 500 });
   }
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "Erreur inattendue.";
 }

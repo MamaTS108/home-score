@@ -71,7 +71,7 @@ export async function analyzeRoom(input: AnalyzeRoomInput): Promise<RoomAnalysis
         text: "Analyse cette photo de pièce et retourne le JSON demandé.",
       },
     ],
-    maxTokens: 1500,
+    maxTokens: 2000,
   });
 
   return {

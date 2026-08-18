@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { extensionFromMimeType, uploadRoomPhoto } from "@/lib/supabase/storage";
 import { ProjectRepository } from "@/lib/repositories/projectRepository";
+import { errorMessage } from "@/lib/utils";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
@@ -61,8 +62,4 @@ export async function GET(request: NextRequest) {
     console.error("GET /api/projects failed", error);
     return NextResponse.json({ error: errorMessage(error) }, { status: 500 });
   }
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "Erreur inattendue.";
 }

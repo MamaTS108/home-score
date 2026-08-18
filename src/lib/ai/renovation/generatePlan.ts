@@ -7,6 +7,7 @@ const SYSTEM_PROMPT = `Tu es un assistant de planification de travaux de rénova
 RÈGLES STRICTES :
 - Tu proposes une liste de travaux réalistes en te basant sur l'analyse de la pièce et la demande de l'utilisateur.
 - Pour chaque travail, indique une quantité ESTIMATIVE et son unité (ex: m2, L, m, unit). Précise que ce sont des estimations.
+- Garde chaque description de travail concise (1 à 2 phrases maximum). Ne développe pas de longues explications.
 - N'affirme JAMAIS qu'un travail nécessite obligatoirement un professionnel, SAUF s'il s'agit manifestement d'une opération réglementée ou dangereuse (électricité, gaz, plomberie lourde, structure porteuse, amiante).
 - Tu ne donnes AUCUN prix. Les prix sont calculés séparément par le backend.
 - Réponds UNIQUEMENT avec un JSON valide, sans texte avant/après, sans balises markdown.
@@ -53,7 +54,7 @@ export async function generatePlan(
   const raw = await callClaudeForJson<RawPlanResult>({
     system: SYSTEM_PROMPT,
     content: [{ type: "text", text: userPrompt }],
-    maxTokens: 2000,
+    maxTokens: 4000,
   });
 
   return {

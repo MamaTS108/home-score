@@ -44,7 +44,7 @@ export async function iterateOnProject(
   const raw = await callClaudeForJson<RawAssistantResult>({
     system: SYSTEM_PROMPT,
     content: [{ type: "text", text: context }],
-    maxTokens: 800,
+    maxTokens: 1200,
   });
 
   return {

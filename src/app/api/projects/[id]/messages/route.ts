@@ -3,7 +3,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { ProjectRepository } from "@/lib/repositories/projectRepository";
 import { iterateOnProject } from "@/lib/ai/assistant/renovationAssistant";
 import { runFullGeneration } from "@/lib/services/generateProject";
-import { fetchImageAsBase64 } from "@/lib/utils";
+import { fetchImageAsBase64, errorMessage } from "@/lib/utils";
 import { AiConfigError } from "@/lib/ai/client";
 
 /**
@@ -67,8 +67,4 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
     return NextResponse.json({ error: errorMessage(error) }, { status: 500 });
   }
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "Erreur inattendue.";
 }

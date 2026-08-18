@@ -65,3 +65,31 @@ export function styleLabel(style: string): string {
   };
   return map[style] ?? style;
 }
+
+/**
+ * Extracts a readable message from any thrown value, including Supabase's
+ * PostgrestError-style objects (plain objects with a `message` field that
+ * are NOT instances of the global `Error` class, so `error instanceof Error`
+ * misses them and silently falls back to a generic message).
+ */
+export function errorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+
+  if (error && typeof error === "object") {
+    const withMessage = error as { message?: unknown; details?: unknown; hint?: unknown; code?: unknown };
+    if (typeof withMessage.message === "string" && withMessage.message.trim()) {
+      const parts = [withMessage.message];
+      if (typeof withMessage.details === "string" && withMessage.details) parts.push(withMessage.details);
+      if (typeof withMessage.hint === "string" && withMessage.hint) parts.push(`(hint: ${withMessage.hint})`);
+      if (typeof withMessage.code === "string" && withMessage.code) parts.push(`[${withMessage.code}]`);
+      return parts.join(" — ");
+    }
+    try {
+      return JSON.stringify(error);
+    } catch {
+      // fall through
+    }
+  }
+
+  return "Erreur inattendue.";
+}
