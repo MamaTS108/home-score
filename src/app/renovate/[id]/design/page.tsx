@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ProjectNav } from "@/components/renovate/ProjectNav";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { RegenerateDesignButton } from "@/components/renovate/RegenerateDesignButton";
 import { getProjectDetail } from "@/lib/data/getProjectDetail";
 
 export default async function DesignPage({ params }: { params: Promise<{ id: string }> }) {
@@ -56,6 +57,14 @@ export default async function DesignPage({ params }: { params: Promise<{ id: str
                 <p>Ce n&apos;est pas un plan architectural. Le résultat final peut différer de la réalisation.</p>
               </CardContent>
             </Card>
+
+            <div>
+              <RegenerateDesignButton projectId={id} />
+              <p className="text-xs text-muted-foreground mt-2">
+                Un détail vous semble incorrect (porte masquée, élément déplacé...) ? Régénérez — chaque
+                génération IA peut légèrement varier.
+              </p>
+            </div>
 
             {designs.length > 1 && (
               <Card>

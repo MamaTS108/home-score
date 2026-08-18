@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/Button";
 import { Label, Input, Textarea, Select } from "@/components/ui/Field";
 import { Card, CardContent } from "@/components/ui/Card";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { CategoryChoicePicker } from "@/components/renovate/CategoryChoicePicker";
+import { RENOVATION_CHOICE_CATEGORIES, composeDescription } from "@/lib/renovationChoices";
 import type { RenovationStyle } from "@/lib/types";
 
 const STYLES: { value: RenovationStyle; label: string }[] = [
@@ -30,11 +32,15 @@ export function CreateProjectFlow() {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [name, setName] = useState("Mon projet de rénovation");
-  const [description, setDescription] = useState("");
+  const [selections, setSelections] = useState<Record<string, string | null>>({});
+  const [notes, setNotes] = useState("");
   const [style, setStyle] = useState<RenovationStyle>("free");
   const [budgetMax, setBudgetMax] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loadingLabel, setLoadingLabel] = useState("Analyse de votre pièce...");
+
+  const description = composeDescription(selections, notes);
+  const hasAnySelection = Object.values(selections).some((v) => v !== null && v !== undefined);
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const selected = event.target.files?.[0];
@@ -56,8 +62,8 @@ export function CreateProjectFlow() {
       setError("Ajoutez une photo pour continuer.");
       return;
     }
-    if (!description.trim()) {
-      setError("Décrivez ce que vous souhaitez changer.");
+    if (!hasAnySelection && !notes.trim()) {
+      setError("Choisissez au moins un élément à changer, ou décrivez votre projet.");
       return;
     }
 
@@ -159,7 +165,7 @@ export function CreateProjectFlow() {
         </CardContent>
       </Card>
 
-      {/* Step 2: description */}
+      {/* Step 2: structured choices */}
       <Card>
         <CardContent className="space-y-5">
           <div>
@@ -168,13 +174,31 @@ export function CreateProjectFlow() {
           </div>
 
           <div>
-            <Label htmlFor="description">2. Que souhaitez-vous changer ?</Label>
+            <Label>2. Que souhaitez-vous changer ?</Label>
+            <p className="text-sm text-muted-foreground mb-3">
+              Cochez ce que vous voulez changer, puis choisissez une option. Plus c&apos;est précis, meilleur
+              sera le résultat.
+            </p>
+            <div className="space-y-3">
+              {RENOVATION_CHOICE_CATEGORIES.map((category) => (
+                <CategoryChoicePicker
+                  key={category.key}
+                  category={category}
+                  selected={selections[category.key] ?? null}
+                  onChange={(value) => setSelections((prev) => ({ ...prev, [category.key]: value }))}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="notes">Précisions supplémentaires (optionnel)</Label>
             <Textarea
-              id="description"
-              rows={4}
-              placeholder="Je veux un salon moderne, chaleureux, avec du bois clair, un mur beige, un nouveau sol et davantage de rangement."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              id="notes"
+              rows={3}
+              placeholder="Ex : garder la cheminée, ajouter un îlot central si la place le permet..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
             />
           </div>
 
@@ -203,6 +227,15 @@ export function CreateProjectFlow() {
           </div>
         </CardContent>
       </Card>
+
+      {description && (
+        <Card className="bg-accent-soft border-none">
+          <CardContent className="py-3">
+            <p className="text-xs text-muted-foreground mb-1">Aperçu de votre demande</p>
+            <p className="text-sm text-foreground">{description}</p>
+          </CardContent>
+        </Card>
+      )}
 
       {error && (
         <p className="text-sm text-danger bg-danger-soft rounded-[var(--radius-button)] px-3 py-2">{error}</p>

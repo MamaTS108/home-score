@@ -9,6 +9,38 @@ const AI_DISCLAIMER =
 
 const GEMINI_IMAGE_MODEL = "gemini-3.1-flash-lite-image";
 
+/**
+ * Retries a flaky async call a few times with backoff. Gemini (and most
+ * hosted LLM APIs) occasionally return a generic transient "INTERNAL" 500 —
+ * not a real problem with the request, just worth a retry before giving up.
+ */
+async function withRetry<T>(fn: () => Promise<T>, attempts = 3, baseDelayMs = 1000): Promise<T> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+      const isLastAttempt = attempt === attempts;
+      const retryable = isRetryableError(error);
+      if (isLastAttempt || !retryable) throw error;
+      await new Promise((resolve) => setTimeout(resolve, baseDelayMs * attempt));
+    }
+  }
+  throw lastError;
+}
+
+function isRetryableError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return (
+    message.includes("INTERNAL") ||
+    message.includes("500") ||
+    message.includes("503") ||
+    message.includes("overloaded") ||
+    message.includes("UNAVAILABLE")
+  );
+}
+
 export interface GenerateDesignInput {
   projectId: string;
   prompt: string;
@@ -18,11 +50,30 @@ export interface GenerateDesignInput {
   version: number;
 }
 
+/**
+ * A DesignProvider turns a prompt + source photo into a rendered "after" image.
+ *
+ * The MVP ships a StubDesignProvider (no real image-generation backend wired
+ * in yet — see the spec: the MVP must not fake a capability it doesn't have).
+ * To go live, implement this interface against a real provider (e.g. Gemini
+ * image generation, fal.ai, Replicate...) and swap it in `getDesignProvider()`
+ * below — nothing else in the app needs to change.
+ */
 export interface DesignProvider {
   readonly name: string;
   generate(input: GenerateDesignInput): Promise<DesignGeneration>;
 }
 
+/**
+ * MVP stub: does NOT call any image-generation model. It returns the original
+ * photo annotated as a placeholder so the rest of the product (tasks,
+ * materials, budget, iteration) can be fully exercised end-to-end while a
+ * real image-generation integration is added.
+ *
+ * IMPORTANT: this must stay honest in the UI — always label the result as a
+ * placeholder, never as a finished AI rendering, unless a real provider is
+ * configured.
+ */
 export class StubDesignProvider implements DesignProvider {
   readonly name = "stub";
 
@@ -31,6 +82,7 @@ export class StubDesignProvider implements DesignProvider {
       id: randomUUID(),
       projectId: input.projectId,
       prompt: input.prompt,
+      // No image model wired in yet: MVP shows the original photo.
       imageUrl: input.sourceImageUrl,
       sourceImageUrl: input.sourceImageUrl,
       version: input.version,
@@ -41,10 +93,17 @@ export class StubDesignProvider implements DesignProvider {
 }
 
 /**
+ * Real image-generation backend: Google Gemini (gemini-3.1-flash-lite-image),
+ * in image-editing mode (source photo + instruction in, edited photo out).
+ * This is what keeps the same room, walls and windows while only changing
+ * the finishes (spec section 5) — an instruction-based edit of the real
+ * photo, not a from-scratch text-to-image generation.
+ *
  * Requires GEMINI_API_KEY, AND that key's Google Cloud project ("Default
  * Gemini Project" by default) must have a real billing account linked with
  * prepaid credit — a free-trial billing account does not unlock image
- * generation. Check status at https://ai.studio/projects.
+ * generation (confirmed the hard way; see project history). Check status at
+ * https://ai.studio/projects.
  */
 export class GeminiDesignProvider implements DesignProvider {
   readonly name = "gemini-3.1-flash-lite-image";
@@ -68,18 +127,23 @@ export class GeminiDesignProvider implements DesignProvider {
       throw new Error("GeminiDesignProvider requires the source image bytes (sourceImageBase64).");
     }
 
-    const response = await this.client.models.generateContent({
-      model: GEMINI_IMAGE_MODEL,
-      contents: [
-        {
-          role: "user",
-          parts: [
-            { inlineData: { mimeType: input.sourceImageMediaType, data: input.sourceImageBase64 } },
-            { text: input.prompt },
-          ],
-        },
-      ],
-    });
+    // input.prompt is already the full SYSTEM CONSTRAINTS + ROOM ANALYSIS +
+    // USER REQUEST + BUDGET + STYLE prompt built by generateRenovationPrompt.
+    // The user's free text is never sent to the model on its own.
+    const response = await withRetry(() =>
+      this.client.models.generateContent({
+        model: GEMINI_IMAGE_MODEL,
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { inlineData: { mimeType: input.sourceImageMediaType!, data: input.sourceImageBase64! } },
+              { text: input.prompt },
+            ],
+          },
+        ],
+      })
+    );
 
     const parts = response.candidates?.[0]?.content?.parts ?? [];
     const imagePart = parts.find((part) => part.inlineData?.data);
@@ -112,6 +176,9 @@ export class GeminiDesignProvider implements DesignProvider {
 }
 
 export function getDesignProvider(supabase: SupabaseClient): DesignProvider {
+  // Gemini (gemini-3.1-flash-lite-image) is the only real provider - see
+  // project history for how the billing/model-name issues were resolved.
+  // Falls back to the honest placeholder stub if the key isn't configured.
   if (process.env.GEMINI_API_KEY) {
     return new GeminiDesignProvider(supabase);
   }

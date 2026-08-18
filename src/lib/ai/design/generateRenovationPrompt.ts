@@ -83,6 +83,13 @@ function buildRoomAnalysisSection(analysis: RoomAnalysis): string {
   if (analysis.walls.description) lines.push(`- Current walls: ${analysis.walls.description}`);
   if (analysis.floor.description) lines.push(`- Current floor: ${analysis.floor.description}`);
   if (analysis.ceiling.description) lines.push(`- Ceiling: ${analysis.ceiling.description}`);
+  if (analysis.openings.doors !== null || analysis.openings.windows !== null) {
+    const doors = analysis.openings.doors ?? "an unspecified number of";
+    const windows = analysis.openings.windows ?? "an unspecified number of";
+    lines.push(
+      `- Openings detected: ${doors} door(s) and ${windows} window(s), at their current visible positions, sizes and orientation. These exact openings must remain fully visible, unobstructed, unresized and in the same position in the output — do not let new cabinets, furniture or fixtures cover, narrow or reduce any of them, even partially.`
+    );
+  }
   if (analysis.fixedElements.length > 0) {
     lines.push(`- Fixed elements to preserve unless changed below: ${analysis.fixedElements.join(", ")}`);
   }
