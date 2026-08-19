@@ -16,9 +16,12 @@ export const maxDuration = 60;
  * image generation has no 100% guarantee of respecting every constraint on
  * every attempt, so a manual "regenerate" is the practical safety net.
  */
-export async function POST(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
+    const body = await request.json().catch(() => ({}));
+    const note = typeof body?.note === "string" ? body.note.trim() : "";
+
     const supabase = createSupabaseAdminClient();
     const repo = new ProjectRepository(supabase);
 
@@ -43,13 +46,14 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
       currency: detail.project.currency,
     };
 
+    const defaultAlternativeNote =
+      "Propose une disposition/organisation des meubles différente de la version précédente (autre agencement, autre placement), tout en gardant le même style, les mêmes matériaux et couleurs déjà demandés.";
+
     const prompt = generateRenovationPrompt(
       detail.analysis,
       brief,
       detail.plan,
-      nextVersion > 1
-        ? "Propose une disposition/organisation des meubles différente de la version précédente (autre agencement, autre placement), tout en gardant le même style, les mêmes matériaux et couleurs déjà demandés."
-        : undefined
+      note || (nextVersion > 1 ? defaultAlternativeNote : undefined)
     );
     const designProvider = getDesignProvider(supabase);
     const design = await designProvider.generate({

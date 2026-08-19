@@ -52,10 +52,6 @@ export function DesignViewer({
 
       <div>
         <RegenerateDesignButton projectId={projectId} />
-        <p className="text-xs text-muted-foreground mt-2">
-          Un détail vous semble incorrect (porte masquée, élément déplacé...) ? Régénérez : chaque génération IA
-          peut légèrement varier.
-        </p>
       </div>
 
       {designs.length > 1 && (

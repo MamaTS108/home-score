@@ -138,7 +138,7 @@ export function CreateProjectFlow() {
       const genJson = await genRes.json();
       if (!genRes.ok) throw new Error(genJson.error ?? "Erreur lors de la génération.");
 
-      router.push(`/renovate/${projectId}`);
+      router.push(`/renovate/${projectId}/design`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
       setStep("description");
