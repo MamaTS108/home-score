@@ -13,19 +13,35 @@ function SignupFormInner() {
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") ?? "/app";
 
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
     setError(null);
 
+    if (password !== confirmPassword) {
+      setError("Les mots de passe ne correspondent pas.");
+      return;
+    }
+    if (!acceptedTerms) {
+      setError("Vous devez accepter les conditions générales d'utilisation.");
+      return;
+    }
+
+    setLoading(true);
     const supabase = createSupabaseBrowserClient();
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: fullName } },
+    });
 
     setLoading(false);
     if (error) {
@@ -59,6 +75,16 @@ function SignupFormInner() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
+                <Label htmlFor="fullName">Nom complet</Label>
+                <Input
+                  id="fullName"
+                  type="text"
+                  required
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                />
+              </div>
+              <div>
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
@@ -73,6 +99,31 @@ function SignupFormInner() {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
+              <div>
+                <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  required
+                  minLength={6}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+              </div>
+              <label className="flex items-start gap-2 text-sm cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={acceptedTerms}
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-border accent-accent"
+                />
+                <span className="text-muted-foreground">
+                  J&apos;accepte les{" "}
+                  <Link href="/cgu" target="_blank" className="text-accent font-medium">
+                    conditions générales d&apos;utilisation
+                  </Link>
+                </span>
+              </label>
               {error && <p className="text-sm text-danger">{error}</p>}
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? "Création..." : "Créer mon compte"}
