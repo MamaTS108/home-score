@@ -31,13 +31,15 @@ export async function SiteHeader() {
               <SignOutButton />
             </>
           ) : (
-            <Link href="/login" className="text-sm text-muted-foreground hover:text-foreground hidden sm:inline">
-              Se connecter
-            </Link>
+            <>
+              <Link href="/login" className="text-sm text-muted-foreground hover:text-foreground hidden sm:inline">
+                Se connecter
+              </Link>
+              <Link href="/renovate">
+                <Button size="sm">Démarrer ma rénovation</Button>
+              </Link>
+            </>
           )}
-          <Link href="/renovate">
-            <Button size="sm">Démarrer ma rénovation</Button>
-          </Link>
         </div>
       </div>
     </header>
