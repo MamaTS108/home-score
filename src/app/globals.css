@@ -1,11 +1,5 @@
 @import "tailwindcss";
 
-/*
-  HOME SCORE design tokens (spec section 17)
-  Light theme only, references: Linear / Notion / Stripe / Houzz / IKEA.
-  No dark mode for the MVP — the product is meant to feel calm, editorial,
-  photography-led, not a "tech AI gimmick" UI.
-*/
 :root {
   --background: #f7f7f5;
   --surface: #ffffff;
@@ -14,11 +8,15 @@
   --border: #e6e5e0;
   --border-strong: #d8d6cf;
 
-  /* deep, natural green accent */
-  --accent: #1f4d3a;
-  --accent-hover: #163a2b;
-  --accent-soft: #e7efe9;
-  --accent-foreground: #f7f7f5;
+  --accent: #ff5003;
+  --accent-hover: #e04600;
+  --accent-soft: #ffe9dd;
+  --accent-foreground: #ffffff;
+
+  --secondary: #003f7d;
+  --secondary-hover: #00305f;
+  --secondary-soft: #dde8f3;
+  --secondary-foreground: #ffffff;
 
   --danger: #b3432b;
   --danger-soft: #f6e9e4;
@@ -38,6 +36,10 @@
   --color-accent-hover: var(--accent-hover);
   --color-accent-soft: var(--accent-soft);
   --color-accent-foreground: var(--accent-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-secondary-soft: var(--secondary-soft);
+  --color-secondary-foreground: var(--secondary-foreground);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
   --radius-card: var(--radius-card);
@@ -67,35 +69,19 @@ body {
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes flashPulse {
-  0% {
-    opacity: 0;
-  }
-  40% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
+  0% { opacity: 0; }
+  40% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 @keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
