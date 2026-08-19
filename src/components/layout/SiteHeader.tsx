@@ -1,7 +1,14 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { SignOutButton } from "@/components/auth/SignOutButton";
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
       <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
@@ -18,9 +25,16 @@ export function SiteHeader() {
           </Link>
         </nav>
         <div className="flex items-center gap-3">
-          <Link href="/login" className="text-sm text-muted-foreground hover:text-foreground hidden sm:inline">
-            Se connecter
-          </Link>
+          {user ? (
+            <>
+              <span className="text-sm text-muted-foreground hidden sm:inline">{user.email}</span>
+              <SignOutButton />
+            </>
+          ) : (
+            <Link href="/login" className="text-sm text-muted-foreground hover:text-foreground hidden sm:inline">
+              Se connecter
+            </Link>
+          )}
           <Link href="/renovate">
             <Button size="sm">Démarrer ma rénovation</Button>
           </Link>
