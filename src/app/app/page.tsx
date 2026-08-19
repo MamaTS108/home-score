@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { ProjectRepository } from "@/lib/repositories/projectRepository";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, errorMessage } from "@/lib/utils";
+import type { RenovationProject } from "@/lib/types";
 
 export default async function DashboardPage() {
   const supabase = await createSupabaseServerClient();
@@ -20,7 +21,18 @@ export default async function DashboardPage() {
   }
 
   const repo = new ProjectRepository(supabase);
-  const projects = await repo.listProjects(user.id);
+
+  let projects: RenovationProject[] = [];
+  let loadError: string | null = null;
+  try {
+    projects = await repo.listProjects(user.id);
+  } catch (error) {
+    // A freshly-issued session (e.g. right after a password reset) can very
+    // briefly fail a downstream check due to clock skew ("JWT issued at
+    // future") — show a friendly retry message instead of crashing the page.
+    console.error("Failed to load projects on dashboard", error);
+    loadError = errorMessage(error);
+  }
 
   return (
     <>
@@ -38,7 +50,18 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
-        {projects.length === 0 ? (
+        {loadError ? (
+          <Card>
+            <CardContent className="text-center py-16">
+              <p className="text-muted-foreground mb-4">
+                Impossible de charger vos projets pour l&apos;instant. Réessayez dans quelques secondes.
+              </p>
+              <Link href="/app">
+                <Button variant="secondary">Réessayer</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        ) : projects.length === 0 ? (
           <Card>
             <CardContent className="text-center py-16">
               <p className="text-muted-foreground mb-4">Vous n&apos;avez pas encore de projet.</p>

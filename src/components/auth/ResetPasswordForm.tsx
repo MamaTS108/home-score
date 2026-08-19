@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -8,7 +7,6 @@ import { Input, Label } from "@/components/ui/Field";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export function ResetPasswordForm() {
-  const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -35,9 +33,12 @@ export function ResetPasswordForm() {
     }
     setSuccess(true);
     setTimeout(() => {
-      router.push("/app");
-      router.refresh();
-    }, 1500);
+      // Full navigation (not router.push) on purpose: forces a fresh
+      // server-side session read, avoiding the JWT clock-skew edge case
+      // right after a password reset.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.href = "/app";
+    }, 2500);
   }
 
   return (
