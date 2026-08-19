@@ -100,9 +100,9 @@ export async function SiteHeader() {
           <Link href="/app" className="whitespace-nowrap hover:opacity-80 transition-opacity">
             Mes projets
           </Link>
-          <span className="whitespace-nowrap opacity-50 cursor-not-allowed" title="Bientôt disponible">
+          <Link href="/catalogue" className="whitespace-nowrap hover:opacity-80 transition-opacity">
             Catalogue produits
-          </span>
+          </Link>
         </div>
       </div>
     </header>
