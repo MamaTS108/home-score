@@ -4,8 +4,14 @@ import { Card, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { CatalogueWaitlistForm } from "@/components/renovate/CatalogueWaitlistForm";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export default function CataloguePage() {
+export default async function CataloguePage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <>
       <SiteHeader />
@@ -22,13 +28,31 @@ export default function CataloguePage() {
 
           <Card className="mt-10 text-left">
             <CardContent>
-              <CatalogueWaitlistForm />
+              {user ? (
+                <CatalogueWaitlistForm />
+              ) : (
+                <div className="text-center py-4">
+                  <p className="font-medium mb-1">Connectez-vous pour être informé(e)</p>
+                  <p className="text-sm text-muted-foreground mb-5">
+                    Un compte est nécessaire pour choisir vos catégories et recevoir une notification.
+                  </p>
+                  <Link href="/login?next=/catalogue">
+                    <Button>Se connecter</Button>
+                  </Link>
+                  <p className="text-sm text-muted-foreground mt-4">
+                    Pas encore de compte ?{" "}
+                    <Link href="/signup?next=/catalogue" className="text-accent font-medium">
+                      Créer un compte
+                    </Link>
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
           <div className="mt-10">
             <Link href="/renovate">
-              <Button>Démarrer ma rénovation</Button>
+              <Button variant="secondary">Démarrer ma rénovation</Button>
             </Link>
           </div>
         </section>

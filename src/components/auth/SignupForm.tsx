@@ -1,14 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Field";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
-export function SignupForm() {
+function SignupFormInner() {
+  const searchParams = useSearchParams();
+  const nextPath = searchParams.get("next") ?? "/app";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +49,7 @@ export function SignupForm() {
           </p>
         ) : (
           <>
-            <GoogleAuthButton nextPath="/app" />
+            <GoogleAuthButton nextPath={nextPath} />
 
             <div className="flex items-center gap-3 my-5">
               <div className="h-px flex-1 bg-border" />
@@ -79,11 +83,19 @@ export function SignupForm() {
 
         <p className="text-sm text-muted-foreground mt-6 text-center">
           Déjà un compte ?{" "}
-          <Link href="/login" className="text-accent font-medium">
+          <Link href={`/login?next=${encodeURIComponent(nextPath)}`} className="text-accent font-medium">
             Se connecter
           </Link>
         </p>
       </CardContent>
     </Card>
+  );
+}
+
+export function SignupForm() {
+  return (
+    <Suspense fallback={null}>
+      <SignupFormInner />
+    </Suspense>
   );
 }
