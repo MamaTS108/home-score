@@ -3,18 +3,22 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ProjectNav } from "@/components/renovate/ProjectNav";
+import { ProductInterestCTA } from "@/components/renovate/ProductInterestCTA";
+import { ArtisanInterestCTA } from "@/components/renovate/ArtisanInterestCTA";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { getProjectDetail } from "@/lib/data/getProjectDetail";
-import { difficultyLabel, roomTypeLabel, styleLabel } from "@/lib/utils";
+import { difficultyLabel, formatCurrency, roomTypeLabel, styleLabel } from "@/lib/utils";
 
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const detail = await getProjectDetail(id);
   if (!detail) notFound();
 
-  const { project, analysis, plan, designs } = detail;
+  const { project, analysis, plan, designs, productBudget, laborEstimate } = detail;
   const latestDesign = designs[designs.length - 1];
+  const totalEstimate =
+    productBudget && laborEstimate !== null ? productBudget.estimatedProductsTotal + laborEstimate : null;
 
   return (
     <>
@@ -25,7 +29,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
+            {/* ✨ Votre nouvelle pièce — Avant / Après */}
             <Card className="overflow-hidden">
+              <CardHeader>
+                <h2 className="font-semibold">✨ Votre nouvelle pièce</h2>
+              </CardHeader>
               {latestDesign ? (
                 <div className="grid grid-cols-2">
                   <div className="relative aspect-video">
@@ -56,32 +64,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
               </CardContent>
             </Card>
 
-            {analysis && (
-              <Card>
-                <CardHeader>
-                  <h2 className="font-semibold">Analyse de la pièce</h2>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Estimations basées sur la photo, jamais des mesures exactes.
-                  </p>
-                </CardHeader>
-                <CardContent className="grid sm:grid-cols-2 gap-4 text-sm">
-                  <AnalysisRow label="Type de pièce" value={roomTypeLabel(analysis.roomType)} />
-                  <AnalysisRow
-                    label="Surface estimée"
-                    value={analysis.estimatedAreaM2 ? `~${analysis.estimatedAreaM2} m²` : "Non déterminée"}
-                  />
-                  <AnalysisRow label="Murs" value={analysis.walls.description} />
-                  <AnalysisRow label="Sol" value={analysis.floor.description} />
-                  <AnalysisRow label="Style actuel" value={analysis.currentStyle ?? "Non déterminé"} />
-                  <AnalysisRow label="Couleurs dominantes" value={analysis.dominantColors.join(", ") || "—"} />
-                </CardContent>
-              </Card>
-            )}
-
+            {/* 🔨 Travaux recommandés */}
             {plan && (
               <Card>
                 <CardHeader>
-                  <h2 className="font-semibold">Travaux</h2>
+                  <h2 className="font-semibold">🔨 Travaux recommandés</h2>
                   <p className="text-xs text-muted-foreground mt-1">{plan.summary}</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -110,6 +97,55 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                   <p className="text-xs text-muted-foreground pt-2">
                     Certains travaux peuvent nécessiter un professionnel qualifié.
                   </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* 💰 Budget estimatif */}
+            {productBudget && (
+              <Card>
+                <CardHeader>
+                  <h2 className="font-semibold">💰 Budget estimatif</h2>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Estimation indicative, à vérifier avant achat ou travaux — pas un devis professionnel.
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                  <BudgetRow label="Matériaux" value={formatCurrency(productBudget.estimatedProductsTotal)} />
+                  {laborEstimate !== null && (
+                    <BudgetRow label="Main-d'œuvre (estimation très indicative)" value={formatCurrency(laborEstimate)} />
+                  )}
+                  {totalEstimate !== null && (
+                    <BudgetRow label="Total estimé" value={formatCurrency(totalEstimate)} strong />
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Two V1 demand-capture CTAs — no fake marketplace, just waitlists */}
+            <div className="space-y-6">
+              <ProductInterestCTA projectId={id} />
+              <ArtisanInterestCTA projectId={id} />
+            </div>
+
+            {analysis && (
+              <Card>
+                <CardHeader>
+                  <h2 className="font-semibold">Analyse de la pièce</h2>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Estimations basées sur la photo, jamais des mesures exactes.
+                  </p>
+                </CardHeader>
+                <CardContent className="grid sm:grid-cols-2 gap-4 text-sm">
+                  <AnalysisRow label="Type de pièce" value={roomTypeLabel(analysis.roomType)} />
+                  <AnalysisRow
+                    label="Surface estimée"
+                    value={analysis.estimatedAreaM2 ? `~${analysis.estimatedAreaM2} m²` : "Non déterminée"}
+                  />
+                  <AnalysisRow label="Murs" value={analysis.walls.description} />
+                  <AnalysisRow label="Sol" value={analysis.floor.description} />
+                  <AnalysisRow label="Style actuel" value={analysis.currentStyle ?? "Non déterminé"} />
+                  <AnalysisRow label="Couleurs dominantes" value={analysis.dominantColors.join(", ") || "—"} />
                 </CardContent>
               </Card>
             )}
@@ -170,6 +206,15 @@ function InfoRow({ label, value }: { label: string; value: string }) {
     <div className="flex justify-between">
       <span className="text-muted-foreground">{label}</span>
       <span className="font-medium">{value}</span>
+    </div>
+  );
+}
+
+function BudgetRow({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
+  return (
+    <div className={`flex justify-between ${strong ? "pt-2 border-t border-border" : ""}`}>
+      <span className={strong ? "font-medium" : "text-muted-foreground"}>{label}</span>
+      <span className={strong ? "font-semibold text-accent" : "font-medium"}>{value}</span>
     </div>
   );
 }

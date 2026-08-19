@@ -194,6 +194,8 @@ export interface ProjectDetail {
   plan: RenovationPlan | null;
   productBudget: ProductBudget | null;
   budgetSummary: BudgetSummary | null;
+  /** Very rough, deterministic labor estimate — never a quote. See budgetEngine.estimateLaborCost. */
+  laborEstimate: number | null;
   designs: DesignGeneration[];
   homeScore: HomeScoreBreakdown | null;
   messages: AiMessage[];

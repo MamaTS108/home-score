@@ -137,6 +137,29 @@ export function suggestOptimizationTargets(productBudget: ProductBudget, count =
   return [...productBudget.lines].sort((a, b) => b.estimatedTotal - a.estimatedTotal).slice(0, count);
 }
 
+/**
+ * VERY rough labor cost estimate — deterministic, not from the LLM. Never
+ * presented as a quote (spec section 10/24): this exists only to give the
+ * user a ballpark "total project" figure alongside the materials estimate.
+ *
+ * Heuristic: a base multiplier of the materials cost, bumped up when the
+ * plan includes tasks that require a professional (which usually cost more
+ * per hour and take longer) or are marked "hard".
+ */
+export function estimateLaborCost(plan: RenovationPlan, productBudget: ProductBudget): number {
+  if (productBudget.materials <= 0) return 0;
+
+  const totalTasks = plan.tasks.length || 1;
+  const proTasks = plan.tasks.filter((t) => t.requiresProfessional || t.difficulty === "hard").length;
+  const proRatio = proTasks / totalTasks;
+
+  // 0.8x materials when everything is DIY-friendly, up to ~2x when most
+  // tasks need a professional — intentionally coarse.
+  const multiplier = 0.8 + proRatio * 1.2;
+
+  return round2(productBudget.materials * multiplier);
+}
+
 function normalize(value: string): string {
   return value
     .toLowerCase()

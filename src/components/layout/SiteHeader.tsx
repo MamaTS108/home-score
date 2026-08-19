@@ -11,22 +11,18 @@ export async function SiteHeader() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Lets the login link bring people back to wherever they were, after
-  // signing in — set by proxy.ts on every request.
   const headerList = await headers();
   const currentPath = headerList.get("x-pathname") ?? "/";
   const loginHref = `/login?next=${encodeURIComponent(currentPath)}`;
 
   return (
     <header className="sticky top-0 z-40">
-      {/* Top bar: logo, search, account, cart */}
       <div className="border-b border-border bg-background/95 backdrop-blur">
         <div className="mx-auto max-w-6xl px-6 h-20 flex items-center gap-6">
           <Link href="/" className="flex items-center shrink-0">
             <Image src="/images/logo-teelte.png" alt="Teelte" width={130} height={36} className="h-9 w-auto" unoptimized />
           </Link>
 
-          {/* Search bar — visual for now, will search the marketplace catalog once it exists */}
           <div className="hidden md:flex flex-1 max-w-xl">
             <div className="flex w-full h-11 rounded-full border border-border-strong bg-surface overflow-hidden">
               <input
@@ -91,8 +87,7 @@ export async function SiteHeader() {
         </div>
       </div>
 
-      {/* Secondary nav bar */}
-      <div className="bg-secondary text-secondary-foreground">
+      <div className="bg-accent text-accent-foreground">
         <div className="mx-auto max-w-6xl px-6 h-11 flex items-center gap-6 text-sm font-medium overflow-x-auto">
           <Link href="/renovate" className="whitespace-nowrap hover:opacity-80 transition-opacity">
             Nouveau projet

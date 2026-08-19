@@ -3,6 +3,7 @@ import {
   computeBudgetSummary,
   computeProductBudget,
   deriveMaterialRequirements,
+  estimateLaborCost,
   suggestOptimizationTargets,
   summarizeLines,
 } from "@/lib/budget/budgetEngine";
@@ -139,5 +140,38 @@ describe("suggestOptimizationTargets", () => {
     ]);
     const targets = suggestOptimizationTargets(productBudget, 2);
     expect(targets.map((l) => l.id)).toEqual(["1", "3"]);
+  });
+});
+
+describe("estimateLaborCost", () => {
+  it("returns 0 when there are no materials", () => {
+    const productBudget = summarizeLines([]);
+    const plan = makePlan();
+    expect(estimateLaborCost(plan, productBudget)).toBe(0);
+  });
+
+  it("estimates a higher labor cost when more tasks require a professional", () => {
+    const productBudget = summarizeLines([
+      { id: "1", productId: "p1", name: "Parquet", category: "sol", quantity: 25, unit: "m2", estimatedUnitPrice: 22, estimatedTotal: 550, currency: "EUR", provider: "mock" },
+    ]);
+    const diyPlan = makePlan({
+      tasks: [makeTask({ difficulty: "easy", requiresProfessional: false })],
+    });
+    const proPlan = makePlan({
+      tasks: [makeTask({ difficulty: "hard", requiresProfessional: true })],
+    });
+    const diyLabor = estimateLaborCost(diyPlan, productBudget);
+    const proLabor = estimateLaborCost(proPlan, productBudget);
+    expect(proLabor).toBeGreaterThan(diyLabor);
+  });
+
+  it("never returns a negative or NaN value", () => {
+    const productBudget = summarizeLines([
+      { id: "1", productId: "p1", name: "Parquet", category: "sol", quantity: 25, unit: "m2", estimatedUnitPrice: 22, estimatedTotal: 550, currency: "EUR", provider: "mock" },
+    ]);
+    const plan = makePlan({ tasks: [] });
+    const labor = estimateLaborCost(plan, productBudget);
+    expect(labor).toBeGreaterThanOrEqual(0);
+    expect(Number.isNaN(labor)).toBe(false);
   });
 });
