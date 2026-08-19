@@ -54,6 +54,12 @@ describe("generateRenovationPrompt", () => {
     expect(prompt).toContain("clearly and visibly different from the original");
   });
 
+  it("clarifies that furniture layout can be freely reorganized, unlike fixed architecture", () => {
+    const prompt = generateRenovationPrompt(makeAnalysis(), makeBrief(), null);
+    expect(prompt).toContain("FURNITURE LAYOUT IS DIFFERENT FROM ARCHITECTURE");
+    expect(prompt).toContain("A full furniture reorganization is a legitimate, encouraged renovation outcome");
+  });
+
   it("includes room analysis grounding derived from vision, not invented", () => {
     const analysis = makeAnalysis({ fixedElements: ["radiateur", "cheminée"] });
     const prompt = generateRenovationPrompt(analysis, makeBrief(), null);

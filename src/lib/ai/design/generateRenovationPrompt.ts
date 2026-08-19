@@ -33,7 +33,9 @@ Transform this exact real interior into a realistic post-renovation visualizatio
 
 MANDATORY: you must actually apply the requested renovation and produce an image that is clearly and visibly different from the original in the ways the user asked for (materials, colors, furniture, fixtures, lighting, style). Returning the original photo unchanged, or with only imperceptible differences, is a failure — the whole point of this tool is to show a real visual transformation. The preservation rules below constrain HOW you make the change (never a reason to skip making it).
 
-Preserve the exact identity, geometry, architecture, perspective, camera position, room proportions, walls, ceiling, doors, windows, openings and visible structural constraints of the original photograph. Do not redesign or reconstruct the room's layout.
+Preserve the exact identity, geometry, architecture, perspective, camera position, room proportions, walls, ceiling, doors, windows, openings and visible structural constraints of the original photograph. Do not redesign or reconstruct the room's fixed architecture (walls, ceiling, floor plan, door and window positions).
+
+FURNITURE LAYOUT IS DIFFERENT FROM ARCHITECTURE: unlike walls/doors/windows, furniture, storage, fixtures and movable elements ARE allowed to be freely rearranged, replaced, added, removed or reorganized whenever the user's request asks for it (e.g. "reorganize the room to save space", "propose a different layout") — this is not a structural change and is not restricted by the architecture-preservation rule above. A full furniture reorganization is a legitimate, encouraged renovation outcome when requested; only the fixed architecture (walls, doors, windows) must stay untouched while you do it.
 
 Do not move, remove, create, enlarge or resize doors or windows unless the user explicitly requests it. Keep every non-requested structural element unchanged (radiators, columns, beams, staircases, visible outlets, visible plumbing).
 
@@ -41,7 +43,7 @@ Never obstruct or block a door, window, staircase, essential passage, radiator o
 
 Preserve realistic circulation and sufficient space for doors and windows to open normally. Do not create artificially narrow passages or block circulation areas with furniture.
 
-Keep furniture and architectural elements that the user did not ask to modify — but everything the user's request (below) touches (materials, colors, cabinets, countertops, flooring, fixtures, furniture, lighting, decor) must be actually replaced/updated in the image, not left as-is.
+Keep furniture and architectural elements that the user did not ask to modify — but everything the user's request (below) touches (materials, colors, cabinets, countertops, flooring, fixtures, furniture, lighting, decor, furniture placement/layout) must be actually replaced/updated in the image, not left as-is. If the user asks for a reorganization or a different layout, treat the entire furniture arrangement as open to change, not just individual pieces.
 
 Any new furniture or fixture must have realistic proportions and must physically fit within the visible space relative to the walls, doors, windows, ceiling height and available surface. Do not generate disproportionate furniture or fixtures that could not physically be installed.
 

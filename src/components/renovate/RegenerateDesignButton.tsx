@@ -27,7 +27,7 @@ export function RegenerateDesignButton({ projectId }: { projectId: string }) {
   return (
     <div>
       <Button variant="secondary" onClick={handleRegenerate} disabled={loading}>
-        {loading ? "Régénération en cours..." : "Régénérer cette visualisation"}
+        {loading ? "Génération en cours..." : "Proposer une autre version / un autre agencement"}
       </Button>
       {error && <p className="text-sm text-danger mt-2">{error}</p>}
     </div>

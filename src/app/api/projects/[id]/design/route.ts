@@ -3,10 +3,10 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { ProjectRepository } from "@/lib/repositories/projectRepository";
 import { getDesignProvider } from "@/lib/ai/design/generateDesign";
 import { generateRenovationPrompt } from "@/lib/ai/design/generateRenovationPrompt";
-
-export const maxDuration = 60;
 import { fetchImageAsBase64, errorMessage } from "@/lib/utils";
 import { AiConfigError } from "@/lib/ai/client";
+
+export const maxDuration = 60;
 
 /**
  * Regenerates ONLY the AI visualization (a new version), reusing the room
@@ -43,7 +43,14 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
       currency: detail.project.currency,
     };
 
-    const prompt = generateRenovationPrompt(detail.analysis, brief, detail.plan);
+    const prompt = generateRenovationPrompt(
+      detail.analysis,
+      brief,
+      detail.plan,
+      nextVersion > 1
+        ? "Propose une disposition/organisation des meubles différente de la version précédente (autre agencement, autre placement), tout en gardant le même style, les mêmes matériaux et couleurs déjà demandés."
+        : undefined
+    );
     const designProvider = getDesignProvider(supabase);
     const design = await designProvider.generate({
       projectId: id,
