@@ -60,6 +60,13 @@ describe("generateRenovationPrompt", () => {
     expect(prompt).toContain("A full furniture reorganization is a legitimate, encouraged renovation outcome");
   });
 
+  it("allows explicit structural changes (e.g. knocking down a wall) when requested", () => {
+    const prompt = generateRenovationPrompt(makeAnalysis(), makeBrief(), null);
+    expect(prompt).toContain("UNLESS the user's request explicitly asks for a structural change");
+    expect(prompt).toContain("knock down this wall");
+    expect(prompt).toContain("extend the floor and ceiling continuously across the newly merged space");
+  });
+
   it("includes room analysis grounding derived from vision, not invented", () => {
     const analysis = makeAnalysis({ fixedElements: ["radiateur", "cheminée"] });
     const prompt = generateRenovationPrompt(analysis, makeBrief(), null);
@@ -87,12 +94,16 @@ describe("generateRenovationPrompt", () => {
     expect(prompt).toContain("not specified");
   });
 
-  it("carries the iteration note forward as an addition, not a replacement", () => {
+  it("carries the iteration note forward with top priority, not a replacement", () => {
     const prompt = generateRenovationPrompt(makeAnalysis(), makeBrief(), null, "je veux plus de bois");
-    expect(prompt).toContain("Latest adjustment requested by the user");
+    expect(prompt).toContain("PRIORITY CHANGE FOR THIS SPECIFIC GENERATION");
     expect(prompt).toContain("je veux plus de bois");
     // original request must still be present alongside the iteration note
     expect(prompt).toContain("Je veux une cuisine moderne blanche et bois.");
+    // the priority change must appear before the original request in the prompt
+    expect(prompt.indexOf("je veux plus de bois")).toBeLessThan(
+      prompt.indexOf("Je veux une cuisine moderne blanche et bois.")
+    );
   });
 
   it("does not force a style when the user picked 'free'", () => {

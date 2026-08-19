@@ -31,11 +31,11 @@ const SYSTEM_CONSTRAINTS = `SYSTEM CONSTRAINTS (highest priority — apply befor
 
 Transform this exact real interior into a realistic post-renovation visualization based on the user's renovation request below.
 
-MANDATORY: you must actually apply the requested renovation and produce an image that is clearly and visibly different from the original in the ways the user asked for (materials, colors, furniture, fixtures, lighting, style). Returning the original photo unchanged, or with only imperceptible differences, is a failure — the whole point of this tool is to show a real visual transformation. The preservation rules below constrain HOW you make the change (never a reason to skip making it).
+MANDATORY: you must actually apply the requested renovation and produce an image that is clearly and visibly different from the original in the ways the user asked for (materials, colors, furniture, fixtures, lighting, style). Returning the original photo unchanged, or with only imperceptible differences, is a failure — the whole point of this tool is to show a real visual transformation. The preservation rules below constrain HOW you make the change (never a reason to skip making it). This applies with equal force when editing an already-renovated image (a second or later iteration): do not treat the current image as "finished" and resist further changes — if a priority change is specified below, apply it as decisively as you would on a fresh photo.
 
-Preserve the exact identity, geometry, architecture, perspective, camera position, room proportions, walls, ceiling, doors, windows, openings and visible structural constraints of the original photograph. Do not redesign or reconstruct the room's fixed architecture (walls, ceiling, floor plan, door and window positions).
+Preserve the exact identity, geometry, architecture, perspective, camera position, room proportions, walls, ceiling, doors, windows, openings and visible structural constraints of the original photograph BY DEFAULT. Do not redesign or reconstruct the room's fixed architecture (walls, ceiling, floor plan, door and window positions) UNLESS the user's request explicitly asks for a structural change (e.g. "knock down this wall", "open up the space", "merge with the next room", "remove this wall"). When the user explicitly requests a structural change: apply it fully and realistically — remove/open the specified wall, extend the floor and ceiling continuously across the newly merged space, adjust lighting and sightlines accordingly, and keep everything else (the remaining walls, the windows, the camera position and perspective) consistent with the original photo. An explicit structural request always overrides the "preserve architecture" default for that specific element only — every other unmentioned structural element still stays fixed.
 
-FURNITURE LAYOUT IS DIFFERENT FROM ARCHITECTURE: unlike walls/doors/windows, furniture, storage, fixtures and movable elements ARE allowed to be freely rearranged, replaced, added, removed or reorganized whenever the user's request asks for it (e.g. "reorganize the room to save space", "propose a different layout") — this is not a structural change and is not restricted by the architecture-preservation rule above. A full furniture reorganization is a legitimate, encouraged renovation outcome when requested; only the fixed architecture (walls, doors, windows) must stay untouched while you do it.
+FURNITURE LAYOUT IS DIFFERENT FROM ARCHITECTURE: unlike walls/doors/windows, furniture, storage, fixtures and movable elements ARE allowed to be freely rearranged, replaced, added, removed or reorganized whenever the user's request asks for it (e.g. "reorganize the room to save space", "propose a different layout") — this is not a structural change and is not restricted by the architecture-preservation rule above. A full furniture reorganization is a legitimate, encouraged renovation outcome when requested; only the fixed architecture (walls, doors, windows) must stay untouched while you do it, unless a structural change was itself explicitly requested as described above.
 
 Do not move, remove, create, enlarge or resize doors or windows unless the user explicitly requests it. Keep every non-requested structural element unchanged (radiators, columns, beams, staircases, visible outlets, visible plumbing).
 
@@ -102,15 +102,23 @@ function buildRoomAnalysisSection(analysis: RoomAnalysis): string {
 }
 
 function buildUserRequestSection(brief: ProjectBrief, plan: RenovationPlan | null, iterationNote?: string): string {
-  const lines = [`USER RENOVATION REQUEST:`, brief.description];
+  const lines: string[] = [];
+
+  if (iterationNote) {
+    lines.push(
+      `PRIORITY CHANGE FOR THIS SPECIFIC GENERATION (this is the main thing being checked — it MUST be clearly, unmistakably visible in the output, even if the base image already looks finished):`,
+      iterationNote,
+      "",
+      `ORIGINAL PROJECT REQUEST (context, still applies, but the priority change above takes precedence if there's any tension):`,
+      brief.description
+    );
+  } else {
+    lines.push(`USER RENOVATION REQUEST:`, brief.description);
+  }
 
   if (plan) {
     const materialHints = plan.requiredMaterialCategories.join(", ");
     if (materialHints) lines.push(`Materials involved in the plan: ${materialHints}.`);
-  }
-
-  if (iterationNote) {
-    lines.push(`Latest adjustment requested by the user, apply on top of the above: ${iterationNote}`);
   }
 
   return lines.join("\n");
