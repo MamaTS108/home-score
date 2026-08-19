@@ -1,5 +1,5 @@
 /**
- * HOME SCORE — Domain types
+ * Teelte — Domain types
  *
  * These types are the contract between every layer of the app:
  * Vision -> Renovation planning -> Product provider -> Budget engine -> UI.
@@ -148,11 +148,18 @@ export interface DesignGeneration {
   disclaimer: string;
 }
 
+/**
+ * Home Score: an INDICATIVE energy-performance estimate derived from the
+ * room's visible materials and the renovation plan — NOT an official French
+ * DPE (Diagnostic de Performance Énergétique), which requires a certified
+ * diagnostician and real thermal measurements (spec section 24: never
+ * present the product as a diagnostiqueur).
+ */
 export interface HomeScoreBreakdown {
   overall: number; // 0-100
-  designPotential: number;
-  renovationComplexity: number;
-  budgetEfficiency: number;
+  isolation: number;
+  chauffageVentilation: number;
+  ouvertures: number; // windows / glazing
 }
 
 export type AiMessageRole = "user" | "assistant";

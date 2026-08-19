@@ -5,14 +5,17 @@ export function HomeScoreCard({ score }: { score: HomeScoreBreakdown }) {
   return (
     <Card>
       <CardContent>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-1">
           <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Home Score</h3>
           <span className="text-2xl font-semibold text-accent">{score.overall}/100</span>
         </div>
+        <p className="text-xs text-muted-foreground mb-4">
+          Estimation indicative de la performance énergétique — ce n&apos;est pas un DPE officiel.
+        </p>
         <div className="space-y-3">
-          <ScoreRow label="Potentiel de design" value={score.designPotential} />
-          <ScoreRow label="Complexité des travaux" value={score.renovationComplexity} />
-          <ScoreRow label="Efficacité budgétaire" value={score.budgetEfficiency} />
+          <ScoreRow label="Isolation" value={score.isolation} />
+          <ScoreRow label="Chauffage / ventilation" value={score.chauffageVentilation} />
+          <ScoreRow label="Fenêtres / ouvertures" value={score.ouvertures} />
         </div>
       </CardContent>
     </Card>

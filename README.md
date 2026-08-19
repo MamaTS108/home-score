@@ -1,4 +1,4 @@
-# HOME SCORE
+# Teelte
 
 AI Renovation Planner — *Imagine it. Plan it. Budget it.*
 
@@ -116,11 +116,13 @@ npm run test:watch  # mode watch
 
 ## Notes importantes / limitations volontaires du MVP
 
-- **`DesignProvider` est un stub** (`src/lib/ai/design/generateDesign.ts`). Aucun
-  générateur d'image n'est branché : la page "Visualisation" affiche la photo originale
-  en attendant qu'un vrai backend d'image (Gemini image, fal.ai, Replicate...) soit choisi
-  et branché derrière la même interface. Tout le reste de la chaîne (travaux, matériaux,
-  budget, itération) fonctionne réellement avec Claude.
+- **`DesignProvider` uses Gemini 2.5 Flash Image when `GEMINI_API_KEY` is set**
+  (`src/lib/ai/design/generateDesign.ts`), and cleanly falls back to showing
+  the original photo when it isn't — never fakes a render. Get a free key at
+  [aistudio.google.com/apikey](https://aistudio.google.com/apikey). The
+  source photo is sent as an image-edit instruction (keep the same room,
+  window, angle — only change finishes), not a from-scratch generation, so
+  the "after" keeps the same architecture as the "before" (spec section 5).
 - **Le service role Supabase est utilisé côté API routes** pour que le parcours
   fonctionne avant l'authentification (voir le commentaire dans
   `src/lib/supabase/admin.ts`). À review avant une mise en prod avec de vrais comptes.

@@ -9,7 +9,7 @@ export default function RenovatePage() {
         <div className="max-w-xl mx-auto mb-10 text-center">
           <h1 className="text-2xl font-semibold tracking-tight">Créer mon projet de rénovation</h1>
           <p className="text-muted-foreground mt-2">
-            Une photo, une description, et HOME SCORE s&apos;occupe du reste.
+            Une photo, une description, et Teelte s&apos;occupe du reste.
           </p>
         </div>
         <CreateProjectFlow />

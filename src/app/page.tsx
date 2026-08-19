@@ -95,7 +95,7 @@ export default function LandingPage() {
 
       <footer className="border-t border-border py-8">
         <div className="mx-auto max-w-6xl px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-          <span>HOME SCORE, AI Renovation Planner</span>
+          <span>Teelte, AI Renovation Planner</span>
           <span>Estimations indicatives, non contractuelles. Ne remplace pas un devis professionnel.</span>
         </div>
       </footer>
