@@ -21,6 +21,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
     const note = typeof body?.note === "string" ? body.note.trim() : "";
+    const source = body?.source === "latest" ? "latest" : "original";
 
     const supabase = createSupabaseAdminClient();
     const repo = new ProjectRepository(supabase);
@@ -36,7 +37,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       );
     }
 
-    const { base64, mediaType } = await fetchImageAsBase64(detail.project.originalImageUrl);
+    const latestDesign = detail.designs[detail.designs.length - 1];
+    const baseImageUrl =
+      source === "latest" && latestDesign ? latestDesign.imageUrl : detail.project.originalImageUrl;
+
+    const { base64, mediaType } = await fetchImageAsBase64(baseImageUrl);
     const nextVersion = detail.designs.length + 1;
 
     const brief = {
@@ -53,7 +58,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       detail.analysis,
       brief,
       detail.plan,
-      note || (nextVersion > 1 ? defaultAlternativeNote : undefined)
+      note || (nextVersion > 1 && source === "original" ? defaultAlternativeNote : undefined)
     );
     const designProvider = getDesignProvider(supabase);
     const design = await designProvider.generate({

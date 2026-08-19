@@ -4,10 +4,21 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Field";
+import { cn } from "@/lib/utils";
 
-export function RegenerateDesignButton({ projectId }: { projectId: string }) {
+type Source = "original" | "latest";
+
+export function RegenerateDesignButton({
+  projectId,
+  hasExistingDesign = false,
+}: {
+  projectId: string;
+  /** Whether at least one design version already exists (enables the "latest" source option). */
+  hasExistingDesign?: boolean;
+}) {
   const router = useRouter();
   const [note, setNote] = useState("");
+  const [source, setSource] = useState<Source>("original");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,7 +29,7 @@ export function RegenerateDesignButton({ projectId }: { projectId: string }) {
       const res = await fetch(`/api/projects/${projectId}/design`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ note }),
+        body: JSON.stringify({ note, source }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Erreur lors de la régénération.");
@@ -32,7 +43,26 @@ export function RegenerateDesignButton({ projectId }: { projectId: string }) {
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
+      {hasExistingDesign && (
+        <div>
+          <p className="text-xs font-medium text-foreground mb-1.5">Partir de quelle image ?</p>
+          <div className="inline-flex rounded-[var(--radius-button)] border border-border p-0.5 bg-surface">
+            <SourceOption label="Photo originale" active={source === "original"} onClick={() => setSource("original")} />
+            <SourceOption
+              label="Dernière visualisation"
+              active={source === "latest"}
+              onClick={() => setSource("latest")}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground mt-1.5">
+            {source === "original"
+              ? "Repart de votre photo d'origine — bon pour explorer une proposition très différente."
+              : "Modifie la dernière visualisation générée — bon pour un ajustement précis sans tout changer."}
+          </p>
+        </div>
+      )}
+
       <Textarea
         rows={2}
         placeholder="Précisez ce que vous voulez changer (optionnel) : ex. « lit au centre, tête de lit en bois »..."
@@ -44,5 +74,20 @@ export function RegenerateDesignButton({ projectId }: { projectId: string }) {
       </Button>
       {error && <p className="text-sm text-danger">{error}</p>}
     </div>
+  );
+}
+
+function SourceOption({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "text-xs px-3 py-1.5 rounded-[calc(var(--radius-button)-2px)] transition-colors",
+        active ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:text-foreground"
+      )}
+    >
+      {label}
+    </button>
   );
 }
