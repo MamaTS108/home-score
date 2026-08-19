@@ -51,7 +51,7 @@ export function DesignViewer({
       </Card>
 
       <div>
-        <RegenerateDesignButton projectId={projectId} hasExistingDesign />
+        <RegenerateDesignButton projectId={projectId} hasExistingDesign selectedVersion={selected.version} sourceDesignId={selected.id} />
       </div>
 
       {designs.length > 1 && (

@@ -6,15 +6,21 @@ import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Field";
 import { cn } from "@/lib/utils";
 
-type Source = "original" | "latest";
+type Source = "original" | "selected";
 
 export function RegenerateDesignButton({
   projectId,
   hasExistingDesign = false,
+  selectedVersion,
+  sourceDesignId,
 }: {
   projectId: string;
-  /** Whether at least one design version already exists (enables the "latest" source option). */
+  /** Whether at least one design version already exists (enables the "selected" source option). */
   hasExistingDesign?: boolean;
+  /** Version number of the design currently displayed on screen (left/right cards, or a clicked history thumbnail). */
+  selectedVersion?: number;
+  /** ID of that same currently-displayed design — this is what gets edited, not necessarily the newest one. */
+  sourceDesignId?: string;
 }) {
   const router = useRouter();
   const [note, setNote] = useState("");
@@ -29,7 +35,11 @@ export function RegenerateDesignButton({
       const res = await fetch(`/api/projects/${projectId}/design`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ note, source }),
+        body: JSON.stringify({
+          note,
+          source,
+          sourceDesignId: source === "selected" ? sourceDesignId : undefined,
+        }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Erreur lors de la régénération.");
@@ -50,15 +60,15 @@ export function RegenerateDesignButton({
           <div className="inline-flex rounded-[var(--radius-button)] border border-border p-0.5 bg-surface">
             <SourceOption label="Photo originale" active={source === "original"} onClick={() => setSource("original")} />
             <SourceOption
-              label="Dernière visualisation"
-              active={source === "latest"}
-              onClick={() => setSource("latest")}
+              label={`Version affichée${selectedVersion ? ` (v${selectedVersion})` : ""}`}
+              active={source === "selected"}
+              onClick={() => setSource("selected")}
             />
           </div>
           <p className="text-xs text-muted-foreground mt-1.5">
             {source === "original"
               ? "Repart de votre photo d'origine — bon pour explorer une proposition très différente."
-              : "Modifie la dernière visualisation générée — bon pour un ajustement précis sans tout changer."}
+              : "Modifie la version actuellement affichée à l'écran (celle de droite, ou celle sélectionnée dans l'historique) — bon pour un ajustement précis sans tout changer."}
           </p>
         </div>
       )}
