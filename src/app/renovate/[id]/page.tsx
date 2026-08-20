@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ProjectNav } from "@/components/renovate/ProjectNav";
 import { ProductInterestCTA } from "@/components/renovate/ProductInterestCTA";
 import { ArtisanInterestCTA } from "@/components/renovate/ArtisanInterestCTA";
+import { DeleteProjectButton } from "@/components/renovate/DeleteProjectButton";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { getProjectDetail } from "@/lib/data/getProjectDetail";
@@ -162,6 +163,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                 <InfoRow label="Statut" value={project.status} />
               </CardContent>
             </Card>
+
+            <DeleteProjectButton projectId={project.id} projectName={project.name} />
           </div>
         </div>
       </main>

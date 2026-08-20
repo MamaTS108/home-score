@@ -63,6 +63,22 @@ export class ProjectRepository {
     if (error) throw error;
   }
 
+  /**
+   * Deletes a project and everything attached to it (analysis, plan, tasks,
+   * designs, budget, messages, interest signups) — all of those tables have
+   * `on delete cascade` back to renovation_projects, so a single delete here
+   * is enough. Does NOT delete the uploaded photo / generated images from
+   * Storage (left as an acceptable simplification for now).
+   */
+  async deleteProject(projectId: string, userId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from("renovation_projects")
+      .delete()
+      .eq("id", projectId)
+      .eq("user_id", userId);
+    if (error) throw error;
+  }
+
   async updateRoomType(projectId: string, roomType: RoomType): Promise<void> {
     const { error } = await this.supabase
       .from("renovation_projects")
