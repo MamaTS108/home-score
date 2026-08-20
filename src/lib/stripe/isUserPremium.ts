@@ -9,6 +9,7 @@ export interface PremiumStatus {
   generationsUsed: number;
   generationsLimit: number;
   quotaExceeded: boolean;
+  currentPeriodEnd: string | null;
 }
 
 /** Checks whether a user has an active Premium subscription. Cheap, single-row lookup. */
@@ -36,12 +37,13 @@ export async function getPremiumStatus(supabase: SupabaseClient, userId: string 
     generationsUsed: 0,
     generationsLimit: PREMIUM_MONTHLY_GENERATIONS,
     quotaExceeded: false,
+    currentPeriodEnd: null,
   };
   if (!userId) return inactive;
 
   const { data: sub, error: subError } = await supabase
     .from("user_subscriptions")
-    .select("status, current_period_start")
+    .select("status, current_period_start, current_period_end")
     .eq("user_id", userId)
     .maybeSingle();
 
@@ -62,5 +64,6 @@ export async function getPremiumStatus(supabase: SupabaseClient, userId: string 
     generationsUsed,
     generationsLimit: PREMIUM_MONTHLY_GENERATIONS,
     quotaExceeded: generationsUsed >= PREMIUM_MONTHLY_GENERATIONS,
+    currentPeriodEnd: sub.current_period_end ?? null,
   };
 }
