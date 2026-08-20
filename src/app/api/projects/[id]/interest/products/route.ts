@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { errorMessage } from "@/lib/utils";
+import { notifyProductInterest } from "@/lib/email/notifications";
 
 /**
  * Captures "which product categories are you interested in" instead of
@@ -31,6 +32,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     });
 
     if (error) throw error;
+
+    // Best-effort — never blocks the response, and never fails the request.
+    void notifyProductInterest({ userEmail: user?.email ?? null, categories });
 
     return NextResponse.json({ ok: true });
   } catch (error) {

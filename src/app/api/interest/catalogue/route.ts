@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { errorMessage } from "@/lib/utils";
+import { notifyProductInterest } from "@/lib/email/notifications";
 
 /**
  * Same demand-capture principle as /api/projects/[id]/interest/products, but
@@ -31,6 +32,8 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) throw error;
+
+    void notifyProductInterest({ userEmail: user?.email ?? null, categories });
 
     return NextResponse.json({ ok: true });
   } catch (error) {

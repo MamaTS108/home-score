@@ -3,6 +3,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { ProjectRepository } from "@/lib/repositories/projectRepository";
 import { errorMessage } from "@/lib/utils";
+import { notifyArtisanInterest } from "@/lib/email/notifications";
 
 /**
  * Captures "I'm interested in an artisan for this project" instead of
@@ -40,6 +41,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     });
 
     if (error) throw error;
+
+    void notifyArtisanInterest({ userEmail: user?.email ?? null, workType, location });
 
     return NextResponse.json({ ok: true });
   } catch (error) {
