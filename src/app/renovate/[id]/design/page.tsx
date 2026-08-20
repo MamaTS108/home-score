@@ -4,6 +4,8 @@ import { ProjectNav } from "@/components/renovate/ProjectNav";
 import { DesignViewer } from "@/components/renovate/DesignViewer";
 import { Card, CardContent } from "@/components/ui/Card";
 import { getProjectDetail } from "@/lib/data/getProjectDetail";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getPremiumStatus } from "@/lib/stripe/isUserPremium";
 
 export default async function DesignPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -11,6 +13,12 @@ export default async function DesignPage({ params }: { params: Promise<{ id: str
   if (!detail) notFound();
 
   const { project, designs } = detail;
+
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const premium = await getPremiumStatus(supabase, user?.id ?? null);
 
   return (
     <>
@@ -28,7 +36,13 @@ export default async function DesignPage({ params }: { params: Promise<{ id: str
             </CardContent>
           </Card>
         ) : (
-          <DesignViewer projectId={id} originalImageUrl={project.originalImageUrl} designs={designs} />
+          <DesignViewer
+            projectId={id}
+            originalImageUrl={project.originalImageUrl}
+            designs={designs}
+            premiumUnlocked={project.premiumUnlocked}
+            isPremium={premium.isPremium && !premium.quotaExceeded}
+          />
         )}
       </main>
     </>

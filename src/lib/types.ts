@@ -183,6 +183,8 @@ export interface RenovationProject {
   currency: Currency;
   status: ProjectStatus;
   originalImageUrl: string;
+  /** True once the user has paid to unlock the 3rd+ AI visualization for this project. */
+  premiumUnlocked: boolean;
   createdAt: string;
   updatedAt: string;
 }

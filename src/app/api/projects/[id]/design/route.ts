@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { ProjectRepository } from "@/lib/repositories/projectRepository";
 import { getDesignProvider } from "@/lib/ai/design/generateDesign";
 import { generateRenovationPrompt } from "@/lib/ai/design/generateRenovationPrompt";
 import { fetchImageAsBase64, errorMessage } from "@/lib/utils";
 import { AiConfigError } from "@/lib/ai/client";
+import { getPremiumStatus } from "@/lib/stripe/isUserPremium";
 
 export const maxDuration = 60;
+
+/** Generations 1 and 2 are free. From the 3rd onward, the project must be unlocked or the user Premium. */
+const FREE_GENERATIONS = 2;
 
 /**
  * Regenerates ONLY the AI visualization (a new version), reusing the room
@@ -36,6 +41,33 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         { error: "Générez d'abord une analyse complète avant de régénérer la visualisation." },
         { status: 400 }
       );
+    }
+
+    // Server-side enforcement of the free-tier limit — never trust the UI
+    // alone, a request could be sent directly to this endpoint.
+    if (!detail.project.premiumUnlocked && detail.designs.length >= FREE_GENERATIONS) {
+      const sessionClient = await createSupabaseServerClient();
+      const {
+        data: { user },
+      } = await sessionClient.auth.getUser();
+      const premium = await getPremiumStatus(sessionClient, user?.id ?? null);
+
+      if (!premium.isPremium) {
+        return NextResponse.json(
+          { error: "Limite gratuite atteinte. Débloquez ce projet ou passez Premium pour continuer.", paywall: true },
+          { status: 402 }
+        );
+      }
+
+      if (premium.quotaExceeded) {
+        return NextResponse.json(
+          {
+            error: `Quota Premium atteint (${premium.generationsLimit} générations ce mois-ci). Débloquez ce projet à l'unité pour continuer, ou patientez le renouvellement de votre abonnement.`,
+            paywall: true,
+          },
+          { status: 402 }
+        );
+      }
     }
 
     // "selected" edits whichever version is currently displayed on screen

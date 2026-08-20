@@ -309,6 +309,7 @@ function mapProject(row: {
   currency: RenovationProject["currency"];
   status: RenovationProject["status"];
   original_image_url: string;
+  premium_unlocked: boolean;
   created_at: string;
   updated_at: string;
 }): RenovationProject {
@@ -323,6 +324,7 @@ function mapProject(row: {
     currency: row.currency,
     status: row.status,
     originalImageUrl: row.original_image_url,
+    premiumUnlocked: row.premium_unlocked,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
