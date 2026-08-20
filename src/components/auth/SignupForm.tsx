@@ -6,6 +6,7 @@ import { Suspense, useState } from "react";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Field";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -93,9 +94,8 @@ function SignupFormInner() {
               </div>
               <div>
                 <Label htmlFor="password">Mot de passe</Label>
-                <Input
+                <PasswordInput
                   id="password"
-                  type="password"
                   required
                   minLength={6}
                   value={password}
@@ -104,9 +104,8 @@ function SignupFormInner() {
               </div>
               <div>
                 <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
-                <Input
+                <PasswordInput
                   id="confirmPassword"
-                  type="password"
                   required
                   minLength={6}
                   value={confirmPassword}

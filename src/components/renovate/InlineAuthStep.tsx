@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Field";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Card, CardContent } from "@/components/ui/Card";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -77,9 +78,8 @@ export function InlineAuthStep({ onAuthenticated }: { onAuthenticated: () => voi
               </div>
               <div>
                 <Label htmlFor="auth-password">Mot de passe</Label>
-                <Input
+                <PasswordInput
                   id="auth-password"
-                  type="password"
                   required
                   minLength={mode === "signup" ? 6 : undefined}
                   value={password}

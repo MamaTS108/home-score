@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Field";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -64,9 +65,8 @@ export function LoginForm() {
                 Mot de passe oublié ?
               </Link>
             </div>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}

@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Input, Label } from "@/components/ui/Field";
+import { Label } from "@/components/ui/Field";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export function ResetPasswordForm() {
@@ -53,9 +54,8 @@ export function ResetPasswordForm() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="password">Nouveau mot de passe</Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 required
                 minLength={6}
                 value={password}
@@ -64,9 +64,8 @@ export function ResetPasswordForm() {
             </div>
             <div>
               <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
-              <Input
+              <PasswordInput
                 id="confirmPassword"
-                type="password"
                 required
                 minLength={6}
                 value={confirmPassword}
