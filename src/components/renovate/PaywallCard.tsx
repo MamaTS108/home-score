@@ -31,22 +31,45 @@ export function PaywallCard({ projectId, returnTo }: { projectId: string; return
 
   return (
     <Card className="border-accent">
-      <CardContent className="text-center py-8">
-        <p className="text-2xl mb-2">🔒</p>
-        <p className="font-semibold mb-1">Vous avez utilisé vos 2 visualisations gratuites</p>
-        <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
-          Débloquez d&apos;autres propositions sur ce projet, ou passez Premium pour un accès illimité à tous vos
-          projets.
-        </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Button onClick={() => startCheckout("unlock")} disabled={loading !== null}>
-            {loading === "unlock" ? "Redirection..." : "Débloquer ce projet — 4,99 €"}
-          </Button>
-          <Button variant="secondary" onClick={() => startCheckout("premium")} disabled={loading !== null}>
-            {loading === "premium" ? "Redirection..." : "Passer Premium — 9,99 €/mois"}
-          </Button>
+      <CardContent className="py-8">
+        <div className="text-center mb-6">
+          <p className="text-2xl mb-2">🔒</p>
+          <p className="font-semibold mb-1">Vous avez utilisé vos 2 visualisations gratuites</p>
+          <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+            Deux façons de continuer, selon votre besoin :
+          </p>
         </div>
-        {error && <p className="text-sm text-danger mt-4">{error}</p>}
+
+        <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+          <div className="border border-border rounded-[var(--radius-card)] p-4 flex flex-col">
+            <p className="font-medium text-sm mb-1">Débloquer ce projet</p>
+            <p className="text-xs text-muted-foreground mb-4 flex-1">
+              Paiement unique. Régénérations illimitées, mais uniquement sur ce projet précis. Idéal si vous n&apos;avez
+              qu&apos;une seule pièce à rénover.
+            </p>
+            <Button onClick={() => startCheckout("unlock")} disabled={loading !== null} className="w-full">
+              {loading === "unlock" ? "Redirection..." : "4,99 € — une seule fois"}
+            </Button>
+          </div>
+
+          <div className="border border-border rounded-[var(--radius-card)] p-4 flex flex-col">
+            <p className="font-medium text-sm mb-1">Passer Premium</p>
+            <p className="text-xs text-muted-foreground mb-4 flex-1">
+              Abonnement mensuel. Accès illimité à tous vos projets présents et futurs, jusqu&apos;à 200 générations
+              IA par mois. Idéal pour plusieurs pièces ou une rénovation complète.
+            </p>
+            <Button
+              variant="secondary"
+              onClick={() => startCheckout("premium")}
+              disabled={loading !== null}
+              className="w-full"
+            >
+              {loading === "premium" ? "Redirection..." : "9,99 € / mois"}
+            </Button>
+          </div>
+        </div>
+
+        {error && <p className="text-sm text-danger mt-4 text-center">{error}</p>}
       </CardContent>
     </Card>
   );

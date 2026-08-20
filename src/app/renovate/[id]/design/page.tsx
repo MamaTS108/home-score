@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ProjectNav } from "@/components/renovate/ProjectNav";
 import { DesignViewer } from "@/components/renovate/DesignViewer";
+import { CheckoutStatusBanner } from "@/components/renovate/CheckoutStatusBanner";
 import { Card, CardContent } from "@/components/ui/Card";
 import { getProjectDetail } from "@/lib/data/getProjectDetail";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -19,6 +21,8 @@ export default async function DesignPage({ params }: { params: Promise<{ id: str
     data: { user },
   } = await supabase.auth.getUser();
   const premium = await getPremiumStatus(supabase, user?.id ?? null);
+  const isPremiumActive = premium.isPremium && !premium.quotaExceeded;
+  const hasAnyAccess = project.premiumUnlocked || isPremiumActive;
 
   return (
     <>
@@ -28,6 +32,12 @@ export default async function DesignPage({ params }: { params: Promise<{ id: str
           <h1 className="text-2xl font-semibold tracking-tight">{project.name}</h1>
         </div>
         <ProjectNav projectId={id} />
+
+        <div className="mb-6">
+          <Suspense fallback={null}>
+            <CheckoutStatusBanner isUnlocked={hasAnyAccess} />
+          </Suspense>
+        </div>
 
         {designs.length === 0 ? (
           <Card>
@@ -41,7 +51,7 @@ export default async function DesignPage({ params }: { params: Promise<{ id: str
             originalImageUrl={project.originalImageUrl}
             designs={designs}
             premiumUnlocked={project.premiumUnlocked}
-            isPremium={premium.isPremium && !premium.quotaExceeded}
+            isPremium={isPremiumActive}
           />
         )}
       </main>

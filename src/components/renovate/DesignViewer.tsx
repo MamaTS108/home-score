@@ -79,29 +79,24 @@ export function DesignViewer({
         </Card>
       </div>
 
-      {isSelectedLocked ? (
+      {isSelectedLocked || nextGenerationWouldBeLocked ? (
         <PaywallCard projectId={projectId} returnTo={`/renovate/${projectId}/design`} />
       ) : (
-        <Card>
-          <CardContent className="text-sm text-muted-foreground space-y-2">
-            <p className="font-medium text-foreground">{selected.disclaimer}</p>
-            <p>Ce n&apos;est pas un plan architectural. Le résultat final peut différer de la réalisation.</p>
-          </CardContent>
-        </Card>
-      )}
-
-      <div>
-        {nextGenerationWouldBeLocked ? (
-          <PaywallCard projectId={projectId} returnTo={`/renovate/${projectId}/design`} />
-        ) : (
+        <>
+          <Card>
+            <CardContent className="text-sm text-muted-foreground space-y-2">
+              <p className="font-medium text-foreground">{selected.disclaimer}</p>
+              <p>Ce n&apos;est pas un plan architectural. Le résultat final peut différer de la réalisation.</p>
+            </CardContent>
+          </Card>
           <RegenerateDesignButton
             projectId={projectId}
             hasExistingDesign
             selectedVersion={selected.version}
             sourceDesignId={selected.id}
           />
-        )}
-      </div>
+        </>
+      )}
 
       {designs.length > 1 && (
         <Card>
