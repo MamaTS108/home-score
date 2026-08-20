@@ -10,8 +10,9 @@ import { getPremiumStatus } from "@/lib/stripe/isUserPremium";
 
 export const maxDuration = 60;
 
-/** Generations 1 and 2 are free. From the 3rd onward, the project must be unlocked or the user Premium. */
+/** Generations 1 and 2 are free and shown in full. The 3rd is generated as a "teaser" but shown blurred until unlocked. From the 4th onward, generation itself is blocked until the project is unlocked or the user is Premium. */
 const FREE_GENERATIONS = 2;
+const MAX_TEASER_VERSION = FREE_GENERATIONS + 1;
 
 /**
  * Regenerates ONLY the AI visualization (a new version), reusing the room
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     // Server-side enforcement of the free-tier limit — never trust the UI
     // alone, a request could be sent directly to this endpoint.
-    if (!detail.project.premiumUnlocked && detail.designs.length >= FREE_GENERATIONS) {
+    if (!detail.project.premiumUnlocked && detail.designs.length >= MAX_TEASER_VERSION) {
       const sessionClient = await createSupabaseServerClient();
       const {
         data: { user },

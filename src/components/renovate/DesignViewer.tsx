@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -9,8 +9,10 @@ import { PaywallCard } from "@/components/renovate/PaywallCard";
 import { cn } from "@/lib/utils";
 import type { DesignGeneration } from "@/lib/types";
 
-/** Generations 1 and 2 are always shown in full. From the 3rd onward, they're blurred until unlocked. */
+/** Generations 1 and 2 are always shown in full. The 3rd is generated but shown blurred until unlocked. */
 const FREE_GENERATIONS = 2;
+/** Generation up to this version is allowed even when locked (the 3rd is the "teaser") — beyond that, generation itself is blocked until paid. */
+const MAX_TEASER_VERSION = FREE_GENERATIONS + 1;
 
 export function DesignViewer({
   projectId,
@@ -29,11 +31,20 @@ export function DesignViewer({
 }) {
   const latest = designs[designs.length - 1];
   const [selectedId, setSelectedId] = useState(latest.id);
+
+  // Whenever a new version is generated, jump straight to showing it on the
+  // right — don't make the person hunt for it in the history thumbnails.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSelectedId(latest.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [designs.length]);
+
   const selected = designs.find((d) => d.id === selectedId) ?? latest;
 
   const hasAccess = premiumUnlocked || isPremium;
   const isSelectedLocked = !hasAccess && selected.version > FREE_GENERATIONS;
-  const nextGenerationWouldBeLocked = !hasAccess && designs.length >= FREE_GENERATIONS;
+  const nextGenerationWouldBeLocked = !hasAccess && designs.length >= MAX_TEASER_VERSION;
 
   return (
     <div className="space-y-6">
