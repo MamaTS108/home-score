@@ -4,6 +4,7 @@ import { ProfileForm } from "@/components/account/ProfileForm";
 import { ChangePasswordForm } from "@/components/account/ChangePasswordForm";
 import { SubscriptionCard } from "@/components/account/SubscriptionCard";
 import { SignOutButton } from "@/components/auth/SignOutButton";
+import { DeleteAccountButton } from "@/components/account/DeleteAccountButton";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getPremiumStatus } from "@/lib/stripe/isUserPremium";
@@ -49,6 +50,8 @@ export default async function AccountPage() {
             <SignOutButton />
           </CardContent>
         </Card>
+
+        <DeleteAccountButton isPremium={premium.isPremium} />
       </main>
     </>
   );
