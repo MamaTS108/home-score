@@ -12,6 +12,8 @@ export async function SiteHeader() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Lets the login link bring people back to wherever they were, after
+  // signing in — set by proxy.ts on every request.
   const headerList = await headers();
   const currentPath = headerList.get("x-pathname") ?? "/";
   const loginHref = `/login?next=${encodeURIComponent(currentPath)}`;
@@ -20,12 +22,14 @@ export async function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40">
+      {/* Top bar: logo, search, account, cart */}
       <div className="border-b border-border bg-background/95 backdrop-blur">
         <div className="mx-auto max-w-6xl px-6 h-20 flex items-center gap-6">
           <Link href="/" className="flex items-center shrink-0">
             <Image src="/images/logo-teelte.png" alt="Teelte" width={130} height={36} className="h-9 w-auto" unoptimized />
           </Link>
 
+          {/* Search bar — visual for now, will search the marketplace catalog once it exists */}
           <div className="hidden md:flex flex-1 max-w-xl">
             <div className="flex w-full h-11 rounded-full border border-border-strong bg-surface overflow-hidden">
               <input
@@ -52,21 +56,8 @@ export async function SiteHeader() {
           <div className="flex items-center gap-4 ml-auto">
             {user ? (
               <>
-                <Link
-                  href="/compte"
-                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
-                    <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.8" />
-                    <path
-                      d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  <span className="hidden sm:inline">{user.email}</span>
-                  <span className="sm:hidden">Compte</span>
+                <Link href="/compte" className="text-sm text-muted-foreground hover:text-foreground hidden sm:inline">
+                  {user.email}
                 </Link>
                 <SignOutButton />
               </>
@@ -105,6 +96,7 @@ export async function SiteHeader() {
         </div>
       </div>
 
+      {/* Secondary nav bar */}
       <div className="bg-accent text-accent-foreground">
         <div className="mx-auto max-w-6xl px-6 h-11 flex items-center gap-6 text-sm font-medium overflow-x-auto">
           <Link href="/renovate" className="whitespace-nowrap hover:opacity-80 transition-opacity">

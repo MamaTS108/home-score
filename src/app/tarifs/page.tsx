@@ -46,7 +46,7 @@ export default function TarifsPage() {
               <p className="text-xs text-muted-foreground mb-4">Paiement unique, par projet</p>
               <ul className="text-sm text-muted-foreground space-y-2 mb-8 flex-1">
                 <li>✓ Tout ce qui est dans Gratuit</li>
-                <li>✓ Jusqu&apos;à 30 générations sur ce projet précis</li>
+                <li>✓ Régénérations illimitées sur ce projet précis</li>
                 <li>✓ Idéal si vous n&apos;avez qu&apos;une seule pièce à rénover</li>
               </ul>
               <Link href="/renovate">

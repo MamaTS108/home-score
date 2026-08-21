@@ -22,6 +22,13 @@ export default async function AccountPage() {
   const premium = await getPremiumStatus(supabase, user.id);
   const fullName = (user.user_metadata?.full_name as string | undefined) ?? "";
 
+  const { data: unlockedProjects } = await supabase
+    .from("renovation_projects")
+    .select("id, name")
+    .eq("user_id", user.id)
+    .eq("premium_unlocked", true)
+    .order("updated_at", { ascending: false });
+
   return (
     <>
       <SiteHeader />
@@ -38,6 +45,7 @@ export default async function AccountPage() {
           generationsUsed={premium.generationsUsed}
           generationsLimit={premium.generationsLimit}
           currentPeriodEnd={premium.currentPeriodEnd}
+          unlockedProjects={unlockedProjects ?? []}
         />
 
         <ChangePasswordForm />
