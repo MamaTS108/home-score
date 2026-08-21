@@ -18,7 +18,6 @@ export default function TarifsPage() {
         </section>
 
         <section className="mx-auto max-w-5xl px-6 pb-20 grid md:grid-cols-3 gap-6">
-          {/* Free */}
           <Card>
             <CardContent className="py-8 flex flex-col h-full">
               <p className="font-semibold text-lg mb-1">Gratuit</p>
@@ -38,7 +37,6 @@ export default function TarifsPage() {
             </CardContent>
           </Card>
 
-          {/* Unlock (one-time) */}
           <Card className="border-accent">
             <CardContent className="py-8 flex flex-col h-full">
               <p className="font-semibold text-lg mb-1">Débloquer un projet</p>
@@ -46,7 +44,7 @@ export default function TarifsPage() {
               <p className="text-xs text-muted-foreground mb-4">Paiement unique, par projet</p>
               <ul className="text-sm text-muted-foreground space-y-2 mb-8 flex-1">
                 <li>✓ Tout ce qui est dans Gratuit</li>
-                <li>✓ Régénérations illimitées sur ce projet précis</li>
+                <li>✓ Jusqu&apos;à 30 générations sur ce projet précis</li>
                 <li>✓ Idéal si vous n&apos;avez qu&apos;une seule pièce à rénover</li>
               </ul>
               <Link href="/renovate">
@@ -55,7 +53,6 @@ export default function TarifsPage() {
             </CardContent>
           </Card>
 
-          {/* Premium */}
           <Card>
             <CardContent className="py-8 flex flex-col h-full">
               <p className="font-semibold text-lg mb-1">Premium</p>
@@ -63,8 +60,7 @@ export default function TarifsPage() {
               <p className="text-xs text-muted-foreground mb-4">Par mois, résiliable à tout moment</p>
               <ul className="text-sm text-muted-foreground space-y-2 mb-8 flex-1">
                 <li>✓ Tout ce qui est dans Gratuit</li>
-                <li>✓ Régénérations illimitées sur tous vos projets</li>
-                <li>✓ Jusqu&apos;à 200 générations IA par mois</li>
+                <li>✓ Jusqu&apos;à 1000 générations IA par mois, sur tous vos projets</li>
                 <li>✓ Idéal pour plusieurs pièces ou une rénovation complète</li>
               </ul>
               <Link href="/renovate">
@@ -99,7 +95,7 @@ export default function TarifsPage() {
             <div>
               <p className="font-medium text-sm">Les estimations de budget sont-elles fiables ?</p>
               <p className="text-sm text-muted-foreground mt-1">
-                Elles sont indicatives, basées sur des prix moyens du marché — à vérifier avant tout achat ou
+                Elles sont indicatives, basées sur des prix moyens du marché, à vérifier avant tout achat ou
                 engagement de travaux. Ce ne sont pas des devis professionnels.
               </p>
             </div>

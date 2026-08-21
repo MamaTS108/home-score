@@ -1,18 +1,15 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-/** Generous but real cap, protects against unbounded AI cost exposure per subscriber. */
-export const PREMIUM_MONTHLY_GENERATIONS = 200;
+export const PREMIUM_MONTHLY_GENERATIONS = 1000;
 
 export interface PremiumStatus {
   isPremium: boolean;
-  /** AI generations used across all of this user's projects since the current billing period started. */
   generationsUsed: number;
   generationsLimit: number;
   quotaExceeded: boolean;
   currentPeriodEnd: string | null;
 }
 
-/** Checks whether a user has an active Premium subscription. Cheap, single-row lookup. */
 export async function isUserPremium(supabase: SupabaseClient, userId: string | null): Promise<boolean> {
   if (!userId) return false;
 
@@ -26,11 +23,6 @@ export async function isUserPremium(supabase: SupabaseClient, userId: string | n
   return data.status === "active";
 }
 
-/**
- * Full Premium status including the monthly generation quota (200/month by
- * default), counted from design_generations across every project this user
- * owns, since their current Stripe billing period started.
- */
 export async function getPremiumStatus(supabase: SupabaseClient, userId: string | null): Promise<PremiumStatus> {
   const inactive: PremiumStatus = {
     isPremium: false,

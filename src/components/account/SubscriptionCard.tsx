@@ -17,7 +17,6 @@ export function SubscriptionCard({
   generationsUsed: number;
   generationsLimit: number;
   currentPeriodEnd: string | null;
-  /** Projects unlocked individually via the one-time payment — separate from the Premium subscription. */
   unlockedProjects: { id: string; name: string }[];
 }) {
   const [loading, setLoading] = useState<"portal" | "upgrade" | null>(null);
@@ -115,11 +114,11 @@ export function SubscriptionCard({
         ) : (
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              Passez Premium pour un accès illimité (jusqu&apos;à 200 générations/mois) à tous vos projets, présents
+              Passez Premium pour un accès illimité (jusqu&apos;à 1000 générations/mois) à tous vos projets, présents
               et futurs.
             </p>
             <Button onClick={startUpgrade} disabled={loading !== null}>
-              {loading === "upgrade" ? "Redirection..." : "Passer Premium — 9,99 €/mois"}
+              {loading === "upgrade" ? "Redirection..." : "Passer Premium : 9,99 €/mois"}
             </Button>
           </div>
         )}

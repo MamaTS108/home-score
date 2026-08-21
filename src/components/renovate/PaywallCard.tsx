@@ -48,14 +48,14 @@ export function PaywallCard({ projectId, returnTo }: { projectId: string; return
               qu&apos;une seule pièce à rénover.
             </p>
             <Button onClick={() => startCheckout("unlock")} disabled={loading !== null} className="w-full">
-              {loading === "unlock" ? "Redirection..." : "4,99 € — une seule fois"}
+              {loading === "unlock" ? "Redirection..." : "4,99 € : une seule fois"}
             </Button>
           </div>
 
           <div className="border border-border rounded-[var(--radius-card)] p-4 flex flex-col">
             <p className="font-medium text-sm mb-1">Passer Premium</p>
             <p className="text-xs text-muted-foreground mb-4 flex-1">
-              Abonnement mensuel. Accès illimité à tous vos projets présents et futurs, jusqu&apos;à 200 générations
+              Abonnement mensuel. Accès illimité à tous vos projets présents et futurs, jusqu&apos;à 1000 générations
               IA par mois. Idéal pour plusieurs pièces ou une rénovation complète.
             </p>
             <Button

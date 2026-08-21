@@ -9,9 +9,7 @@ import { PaywallCard } from "@/components/renovate/PaywallCard";
 import { cn } from "@/lib/utils";
 import type { DesignGeneration } from "@/lib/types";
 
-/** Generations 1 and 2 are always shown in full. The 3rd is generated but shown blurred until unlocked. */
 const FREE_GENERATIONS = 2;
-/** Generation up to this version is allowed even when locked (the 3rd is the "teaser") — beyond that, generation itself is blocked until paid. */
 const MAX_TEASER_VERSION = FREE_GENERATIONS + 1;
 
 export function DesignViewer({
@@ -24,16 +22,18 @@ export function DesignViewer({
   projectId: string;
   originalImageUrl: string;
   designs: DesignGeneration[];
-  /** This specific project was paid to unlock (one-time payment). */
   premiumUnlocked: boolean;
-  /** The user has an active Premium subscription (unlocks every project). */
   isPremium: boolean;
 }) {
   const latest = designs[designs.length - 1];
   const [selectedId, setSelectedId] = useState(latest.id);
+  const [showUnlockToast, setShowUnlockToast] = useState(true);
 
-  // Whenever a new version is generated, jump straight to showing it on the
-  // right — don't make the person hunt for it in the history thumbnails.
+  useEffect(() => {
+    const timeout = setTimeout(() => setShowUnlockToast(false), 6000);
+    return () => clearTimeout(timeout);
+  }, []);
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedId(latest.id);
@@ -48,17 +48,33 @@ export function DesignViewer({
 
   return (
     <div className="space-y-6">
-      {premiumUnlocked && (
+      {showUnlockToast && premiumUnlocked && (
         <Card className="border-accent bg-accent-soft">
-          <CardContent className="py-3 text-sm text-accent font-medium">
-            🔓 Ce projet est débloqué (paiement unique) — jusqu&apos;à 30 générations sur ce projet.
+          <CardContent className="py-3 text-sm text-accent font-medium flex items-center justify-between gap-3">
+            <span>🔓 Ce projet est débloqué (paiement unique), jusqu&apos;à 30 générations sur ce projet.</span>
+            <button
+              type="button"
+              onClick={() => setShowUnlockToast(false)}
+              className="text-accent/70 hover:text-accent shrink-0"
+              aria-label="Fermer"
+            >
+              ✕
+            </button>
           </CardContent>
         </Card>
       )}
-      {!premiumUnlocked && isPremium && (
+      {showUnlockToast && !premiumUnlocked && isPremium && (
         <Card className="border-accent bg-accent-soft">
-          <CardContent className="py-3 text-sm text-accent font-medium">
-            🔓 Abonnement Premium actif — régénérations illimitées sur tous vos projets.
+          <CardContent className="py-3 text-sm text-accent font-medium flex items-center justify-between gap-3">
+            <span>🔓 Abonnement Premium actif, jusqu&apos;à 1000 générations par mois sur tous vos projets.</span>
+            <button
+              type="button"
+              onClick={() => setShowUnlockToast(false)}
+              className="text-accent/70 hover:text-accent shrink-0"
+              aria-label="Fermer"
+            >
+              ✕
+            </button>
           </CardContent>
         </Card>
       )}
