@@ -80,7 +80,10 @@ export async function SiteHeader() {
                   Se connecter
                 </Link>
                 <Link href="/renovate">
-                  <Button size="sm">Démarrer ma rénovation</Button>
+                  <Button size="sm" className="whitespace-nowrap">
+                    <span className="hidden sm:inline">Démarrer ma rénovation</span>
+                    <span className="sm:hidden">Démarrer...</span>
+                  </Button>
                 </Link>
               </>
             )}

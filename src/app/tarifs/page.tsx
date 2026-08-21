@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { PremiumCheckoutButton } from "@/components/renovate/PremiumCheckoutButton";
 
 export default function TarifsPage() {
   return (
@@ -50,8 +51,11 @@ export default function TarifsPage() {
                 <li>✓ Idéal si vous n&apos;avez qu&apos;une seule pièce à rénover</li>
               </ul>
               <Link href="/renovate">
-                <Button className="w-full">Commencer un projet</Button>
+                <Button className="w-full">Créer mon projet</Button>
               </Link>
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                Le paiement se fait ensuite depuis votre projet.
+              </p>
             </CardContent>
           </Card>
 
@@ -66,11 +70,7 @@ export default function TarifsPage() {
                 <li>✓ Jusqu&apos;à 1000 générations IA par mois, sur tous vos projets</li>
                 <li>✓ Idéal pour plusieurs pièces ou une rénovation complète</li>
               </ul>
-              <Link href="/renovate">
-                <Button variant="secondary" className="w-full">
-                  Commencer un projet
-                </Button>
-              </Link>
+              <PremiumCheckoutButton />
             </CardContent>
           </Card>
         </section>
