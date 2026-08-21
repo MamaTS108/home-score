@@ -108,7 +108,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                 <CardHeader>
                   <h2 className="font-semibold">💰 Budget estimatif</h2>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Estimation indicative, à vérifier avant achat ou travaux — pas un devis professionnel.
+                    Estimation indicative, à vérifier avant achat ou travaux, pas un devis professionnel.
                   </p>
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm">

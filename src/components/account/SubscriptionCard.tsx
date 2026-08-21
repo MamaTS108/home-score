@@ -17,6 +17,7 @@ export function SubscriptionCard({
   generationsUsed: number;
   generationsLimit: number;
   currentPeriodEnd: string | null;
+  /** Projects unlocked individually via the one-time payment — separate from the Premium subscription. */
   unlockedProjects: { id: string; name: string }[];
 }) {
   const [loading, setLoading] = useState<"portal" | "upgrade" | null>(null);

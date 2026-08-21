@@ -52,7 +52,7 @@ export function DeleteAccountButton({ isPremium }: { isPremium: boolean }) {
             {isPremium && (
               <p className="text-sm text-danger font-medium">
                 ⚠️ Vous avez un abonnement Premium actif. Supprimer votre compte n&apos;annule pas automatiquement
-                cet abonnement — pensez à l&apos;annuler d&apos;abord ci-dessus (« Gérer mon abonnement ») pour
+                cet abonnement, pensez à l&apos;annuler d&apos;abord ci-dessus (« Gérer mon abonnement ») pour
                 éviter d&apos;être facturé à nouveau.
               </p>
             )}

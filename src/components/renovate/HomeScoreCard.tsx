@@ -10,7 +10,7 @@ export function HomeScoreCard({ score }: { score: HomeScoreBreakdown }) {
           <span className="text-2xl font-semibold text-accent">{score.overall}/100</span>
         </div>
         <p className="text-xs text-muted-foreground mb-4">
-          Estimation indicative de la performance énergétique — ce n&apos;est pas un DPE officiel.
+          Estimation indicative de la performance énergétique, ce n&apos;est pas un DPE officiel.
         </p>
         <div className="space-y-3">
           <ScoreRow label="Isolation" value={score.isolation} />

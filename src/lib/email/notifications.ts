@@ -37,7 +37,7 @@ export async function notifyProductInterest(params: { userEmail: string | null; 
         resend.emails.send({
           from: EMAIL_FROM,
           to: userEmail,
-          subject: "Teelte — Votre demande a bien été enregistrée",
+          subject: "Teelte : Votre demande a bien été enregistrée",
           html: `<p>Merci ! Nous vous préviendrons dès que notre sélection de produits sera disponible.</p><p>Catégories qui vous intéressent : <strong>${labels}</strong></p>`,
         }),
       "product interest user confirmation"
@@ -72,7 +72,7 @@ export async function notifyArtisanInterest(params: {
         resend.emails.send({
           from: EMAIL_FROM,
           to: userEmail,
-          subject: "Teelte — Votre demande a bien été enregistrée",
+          subject: "Teelte : Votre demande a bien été enregistrée",
           html: `<p>Merci ! Nous vous contacterons dès qu'un professionnel sera disponible dans votre zone.</p>`,
         }),
       "artisan interest user confirmation"
@@ -85,7 +85,7 @@ export async function notifyArtisanInterest(params: {
         resend.emails.send({
           from: EMAIL_FROM,
           to: ADMIN_EMAIL,
-          subject: `Nouvelle demande artisan${location ? ` — ${location}` : ""}`,
+          subject: `Nouvelle demande artisan${location ? `, ${location}` : ""}`,
           html: `<p>Nouvelle demande de mise en relation avec un artisan.</p><p>Email : ${userEmail ?? "anonyme"}</p><p>Travaux : ${workType ?? "non précisé"}</p><p>Localisation : ${location ?? "non précisée"}</p>`,
         }),
       "artisan interest admin notification"

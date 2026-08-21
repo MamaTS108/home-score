@@ -56,8 +56,21 @@ export async function SiteHeader() {
           <div className="flex items-center gap-4 ml-auto">
             {user ? (
               <>
-                <Link href="/compte" className="text-sm text-muted-foreground hover:text-foreground hidden sm:inline">
-                  {user.email}
+                <Link
+                  href="/compte"
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+                    <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.8" />
+                    <path
+                      d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <span className="hidden sm:inline">{user.email}</span>
+                  <span className="sm:hidden">Compte</span>
                 </Link>
                 <SignOutButton />
               </>
@@ -74,7 +87,7 @@ export async function SiteHeader() {
             <button
               type="button"
               disabled
-              title="Panier — bientôt disponible"
+              title="Panier, bientôt disponible"
               className="relative h-9 w-9 flex items-center justify-center rounded-full text-muted-foreground disabled:cursor-not-allowed"
             >
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>

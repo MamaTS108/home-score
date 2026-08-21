@@ -10,7 +10,7 @@ export function BudgetBar({
   if (budgetMax === null) {
     return (
       <div className="text-sm text-muted-foreground">
-        Aucun budget maximum défini — estimation produits : {formatCurrency(estimatedTotal)}
+        Aucun budget maximum défini, estimation produits : {formatCurrency(estimatedTotal)}
       </div>
     );
   }

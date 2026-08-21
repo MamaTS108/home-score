@@ -7,7 +7,7 @@ export default function CguPage() {
       <main className="flex-1 mx-auto max-w-3xl w-full px-6 py-16">
         <h1 className="text-2xl font-semibold tracking-tight mb-2">Conditions générales d&apos;utilisation</h1>
         <p className="text-sm text-muted-foreground mb-10">
-          Document indicatif — à faire relire et compléter par un professionnel du droit avant toute mise en
+          Document indicatif, à faire relire et compléter par un professionnel du droit avant toute mise en
           production réelle.
         </p>
 

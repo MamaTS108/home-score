@@ -82,7 +82,7 @@ export function errorMessage(error: unknown): string {
       if (typeof withMessage.details === "string" && withMessage.details) parts.push(withMessage.details);
       if (typeof withMessage.hint === "string" && withMessage.hint) parts.push(`(hint: ${withMessage.hint})`);
       if (typeof withMessage.code === "string" && withMessage.code) parts.push(`[${withMessage.code}]`);
-      return parts.join(" — ");
+      return parts.join(" - ");
     }
     try {
       return JSON.stringify(error);

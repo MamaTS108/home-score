@@ -143,7 +143,7 @@ export default async function AdminDemandesPage() {
               <div key={row.id} className="flex items-center justify-between text-sm border-b border-border pb-2 last:border-0">
                 <span className="text-muted-foreground">
                   {row.work_type ?? "Travaux non précisés"}
-                  {row.location ? ` — ${row.location}` : ""}
+                  {row.location ? `, ${row.location}` : ""}
                 </span>
                 <span className="text-xs text-muted-foreground">
                   {new Date(row.created_at).toLocaleDateString("fr-FR")}

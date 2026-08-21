@@ -67,8 +67,8 @@ export function RegenerateDesignButton({
           </div>
           <p className="text-xs text-muted-foreground mt-1.5">
             {source === "original"
-              ? "Repart de votre photo d'origine — bon pour explorer une proposition très différente."
-              : "Modifie la version actuellement affichée à l'écran (celle de droite, ou celle sélectionnée dans l'historique) — bon pour un ajustement précis sans tout changer."}
+              ? "Repart de votre photo d'origine, bon pour explorer une proposition très différente."
+              : "Modifie la version actuellement affichée à l'écran (celle de droite, ou celle sélectionnée dans l'historique), bon pour un ajustement précis sans tout changer."}
           </p>
         </div>
       )}

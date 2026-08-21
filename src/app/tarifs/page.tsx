@@ -18,6 +18,7 @@ export default function TarifsPage() {
         </section>
 
         <section className="mx-auto max-w-5xl px-6 pb-20 grid md:grid-cols-3 gap-6">
+          {/* Free */}
           <Card>
             <CardContent className="py-8 flex flex-col h-full">
               <p className="font-semibold text-lg mb-1">Gratuit</p>
@@ -37,6 +38,7 @@ export default function TarifsPage() {
             </CardContent>
           </Card>
 
+          {/* Unlock (one-time) */}
           <Card className="border-accent">
             <CardContent className="py-8 flex flex-col h-full">
               <p className="font-semibold text-lg mb-1">Débloquer un projet</p>
@@ -53,6 +55,7 @@ export default function TarifsPage() {
             </CardContent>
           </Card>
 
+          {/* Premium */}
           <Card>
             <CardContent className="py-8 flex flex-col h-full">
               <p className="font-semibold text-lg mb-1">Premium</p>
