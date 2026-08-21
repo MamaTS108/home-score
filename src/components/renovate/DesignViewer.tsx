@@ -48,6 +48,20 @@ export function DesignViewer({
 
   return (
     <div className="space-y-6">
+      {premiumUnlocked && (
+        <Card className="border-accent bg-accent-soft">
+          <CardContent className="py-3 text-sm text-accent font-medium">
+            🔓 Ce projet est débloqué (paiement unique) — jusqu&apos;à 30 générations sur ce projet.
+          </CardContent>
+        </Card>
+      )}
+      {!premiumUnlocked && isPremium && (
+        <Card className="border-accent bg-accent-soft">
+          <CardContent className="py-3 text-sm text-accent font-medium">
+            🔓 Abonnement Premium actif — régénérations illimitées sur tous vos projets.
+          </CardContent>
+        </Card>
+      )}
       <div className="grid md:grid-cols-2 gap-6">
         <Card className="overflow-hidden">
           <div className="relative aspect-[4/3]">

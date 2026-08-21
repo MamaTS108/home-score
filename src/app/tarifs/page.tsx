@@ -18,6 +18,7 @@ export default function TarifsPage() {
         </section>
 
         <section className="mx-auto max-w-5xl px-6 pb-20 grid md:grid-cols-3 gap-6">
+          {/* Free */}
           <Card>
             <CardContent className="py-8 flex flex-col h-full">
               <p className="font-semibold text-lg mb-1">Gratuit</p>
@@ -37,6 +38,7 @@ export default function TarifsPage() {
             </CardContent>
           </Card>
 
+          {/* Unlock (one-time) */}
           <Card className="border-accent">
             <CardContent className="py-8 flex flex-col h-full">
               <p className="font-semibold text-lg mb-1">Débloquer un projet</p>
@@ -44,7 +46,7 @@ export default function TarifsPage() {
               <p className="text-xs text-muted-foreground mb-4">Paiement unique, par projet</p>
               <ul className="text-sm text-muted-foreground space-y-2 mb-8 flex-1">
                 <li>✓ Tout ce qui est dans Gratuit</li>
-                <li>✓ Régénérations illimitées sur ce projet précis</li>
+                <li>✓ Jusqu&apos;à 30 générations sur ce projet précis</li>
                 <li>✓ Idéal si vous n&apos;avez qu&apos;une seule pièce à rénover</li>
               </ul>
               <Link href="/renovate">
@@ -53,6 +55,7 @@ export default function TarifsPage() {
             </CardContent>
           </Card>
 
+          {/* Premium */}
           <Card>
             <CardContent className="py-8 flex flex-col h-full">
               <p className="font-semibold text-lg mb-1">Premium</p>

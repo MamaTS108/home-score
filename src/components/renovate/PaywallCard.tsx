@@ -44,7 +44,7 @@ export function PaywallCard({ projectId, returnTo }: { projectId: string; return
           <div className="border border-border rounded-[var(--radius-card)] p-4 flex flex-col">
             <p className="font-medium text-sm mb-1">Débloquer ce projet</p>
             <p className="text-xs text-muted-foreground mb-4 flex-1">
-              Paiement unique. Régénérations illimitées, mais uniquement sur ce projet précis. Idéal si vous n&apos;avez
+              Paiement unique. Jusqu&apos;à 30 générations sur ce projet précis. Idéal si vous n&apos;avez
               qu&apos;une seule pièce à rénover.
             </p>
             <Button onClick={() => startCheckout("unlock")} disabled={loading !== null} className="w-full">

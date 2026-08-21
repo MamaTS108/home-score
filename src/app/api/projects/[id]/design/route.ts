@@ -13,6 +13,8 @@ export const maxDuration = 60;
 /** Generations 1 and 2 are free and shown in full. The 3rd is generated as a "teaser" but shown blurred until unlocked. From the 4th onward, generation itself is blocked until the project is unlocked or the user is Premium. */
 const FREE_GENERATIONS = 2;
 const MAX_TEASER_VERSION = FREE_GENERATIONS + 1;
+/** A one-time "unlock this project" payment gives generous but capped access — not truly unlimited, to keep our AI cost bounded on a single project. */
+const UNLOCKED_PROJECT_MAX_GENERATIONS = 30;
 
 /**
  * Regenerates ONLY the AI visualization (a new version), reusing the room
@@ -69,6 +71,18 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
           { status: 402 }
         );
       }
+    }
+
+    // A project unlocked via the one-time payment is generous but capped —
+    // not truly unlimited, to keep AI cost bounded on a single project.
+    if (detail.project.premiumUnlocked && detail.designs.length >= UNLOCKED_PROJECT_MAX_GENERATIONS) {
+      return NextResponse.json(
+        {
+          error: `Ce projet a atteint sa limite de ${UNLOCKED_PROJECT_MAX_GENERATIONS} générations. Passez Premium pour continuer sur ce projet et tous les autres.`,
+          paywall: true,
+        },
+        { status: 402 }
+      );
     }
 
     // "selected" edits whichever version is currently displayed on screen
