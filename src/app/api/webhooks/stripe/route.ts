@@ -3,8 +3,6 @@ import { getStripe } from "@/lib/stripe/client";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type Stripe from "stripe";
 
-// Stripe needs the raw request body to verify the webhook signature — this
-// route must not run through any body-parsing middleware.
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
@@ -38,6 +36,12 @@ export async function POST(request: NextRequest) {
         const session = event.data.object as Stripe.Checkout.Session;
         const kind = session.metadata?.kind;
 
+        console.log("Stripe webhook: checkout.session.completed", {
+          kind,
+          metadata: session.metadata,
+          hasSubscription: !!session.subscription,
+        });
+
         if (kind === "project_unlock") {
           const projectId = session.metadata?.project_id;
           if (projectId) {
@@ -46,6 +50,9 @@ export async function POST(request: NextRequest) {
               .update({ premium_unlocked: true })
               .eq("id", projectId);
             if (error) throw error;
+            console.log("Project unlocked", projectId);
+          } else {
+            console.warn("checkout.session.completed with kind=project_unlock but no project_id in metadata");
           }
         }
 
@@ -53,9 +60,14 @@ export async function POST(request: NextRequest) {
           const userId = session.metadata?.user_id;
           const subscriptionId =
             typeof session.subscription === "string" ? session.subscription : session.subscription?.id;
-          if (userId && subscriptionId) {
-            // Fetch the full subscription to get the billing period right
-            // away, rather than waiting for a separate webhook event.
+
+          if (!userId || !subscriptionId) {
+            console.warn("checkout.session.completed with kind=premium_subscription but missing data", {
+              userId,
+              subscriptionId,
+              rawSubscription: session.subscription,
+            });
+          } else {
             const subscription = await stripe.subscriptions.retrieve(subscriptionId);
             const periodStart = (subscription as unknown as { current_period_start?: number }).current_period_start;
             const periodEnd = (subscription as unknown as { current_period_end?: number }).current_period_end;
@@ -70,6 +82,7 @@ export async function POST(request: NextRequest) {
               updated_at: new Date().toISOString(),
             });
             if (error) throw error;
+            console.log("Subscription activated for user", userId);
           }
         }
         break;
