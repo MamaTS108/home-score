@@ -164,9 +164,24 @@ export function EyewearTryOn({ product, onClose }: Props) {
           const glassesWidth = faceW * GLASSES_WIDTH_RATIO;
           const glassesHeight = glassesWidth * (glassesImg.naturalHeight / glassesImg.naturalWidth);
 
+                  // Cheap pseudo-3D: as the head turns left/right (yaw), foreshorten
+          // the glasses horizontally so they don't look like a flat sticker
+          // stuck on top of a turning head. Clamped so they never collapse
+          // to nothing on a sharp turn.
+          const yaw = typeof detectState.ry === "number" ? detectState.ry : 0;
+          const yawForeshortening = Math.max(0.55, Math.cos(yaw));
+
           ctx.save();
           ctx.translate(centerX, centerY);
           ctx.rotate(-detectState.rz);
+          ctx.scale(yawForeshortening, 1);
+
+          // A soft, slightly-offset shadow underneath the frame grounds it on
+          // the face instead of it looking like it's floating above the skin.
+          ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
+          ctx.shadowBlur = faceW * 0.03;
+          ctx.shadowOffsetY = faceW * 0.015;
+
           ctx.drawImage(glassesImg, -glassesWidth / 2, -glassesHeight / 2, glassesWidth, glassesHeight);
           ctx.restore();
         },
