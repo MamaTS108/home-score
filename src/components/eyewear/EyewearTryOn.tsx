@@ -52,15 +52,27 @@ export function EyewearTryOn({ product, onClose }: Props) {
           "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.0.1/wasm"
         );
 
-        const faceLandmarker = await FaceLandmarker.createFromOptions(filesetResolver, {
-          baseOptions: {
-            modelAssetPath:
-              "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
-            delegate: "GPU",
-          },
-          runningMode: "VIDEO",
-          numFaces: 1,
-        });
+        // The GPU delegate is faster but unsupported on some browsers
+        // (notably Safari in several configurations), where it throws
+        // instead of falling back on its own -- so we try GPU first and
+        // retry with CPU if that fails.
+        const modelAssetPath =
+          "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
+        let faceLandmarker;
+        try {
+          faceLandmarker = await FaceLandmarker.createFromOptions(filesetResolver, {
+            baseOptions: { modelAssetPath, delegate: "GPU" },
+            runningMode: "VIDEO",
+            numFaces: 1,
+          });
+        } catch (gpuError) {
+          console.warn("GPU delegate failed for face landmarker, retrying with CPU", gpuError);
+          faceLandmarker = await FaceLandmarker.createFromOptions(filesetResolver, {
+            baseOptions: { modelAssetPath, delegate: "CPU" },
+            runningMode: "VIDEO",
+            numFaces: 1,
+          });
+        }
 
         if (cancelled) {
           faceLandmarker.close();
@@ -90,11 +102,16 @@ export function EyewearTryOn({ product, onClose }: Props) {
         if (cancelled) return;
         console.error("Eyewear try-on failed to start", err);
         setStatus("error");
-        setErrorMessage(
-          err instanceof DOMException && err.name === "NotAllowedError"
-            ? "Accès à la webcam refusé. Autorisez la caméra dans votre navigateur pour essayer les lunettes."
-            : "Impossible de démarrer l'essayage virtuel sur cet appareil."
-        );
+        if (err instanceof DOMException && err.name === "NotAllowedError") {
+          setErrorMessage("Accès à la webcam refusé. Autorisez la caméra dans votre navigateur pour essayer les lunettes.");
+        } else if (err instanceof DOMException && err.name === "NotFoundError") {
+          setErrorMessage("Aucune webcam détectée sur cet appareil.");
+        } else if (typeof window !== "undefined" && !window.isSecureContext) {
+          setErrorMessage("L'essayage virtuel nécessite une connexion sécurisée (https).");
+        } else {
+          const detail = err instanceof Error ? err.message : String(err);
+          setErrorMessage(`Impossible de démarrer l'essayage virtuel sur cet appareil (${detail}).`);
+        }
       }
     }
 
