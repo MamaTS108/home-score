@@ -1,4 +1,3 @@
-cat > src/app/essayage/page.tsx << 'TEELTE_EOF'
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { Badge } from "@/components/ui/Badge";
 import { EyewearTryOnPage } from "@/components/eyewear/EyewearTryOnPage";
@@ -35,4 +34,3 @@ export default async function EssayagePage() {
     </>
   );
 }
-TEELTE_EOF
