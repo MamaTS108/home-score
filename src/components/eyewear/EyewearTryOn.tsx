@@ -24,8 +24,8 @@ const TRACKING_CANVAS_ID = "eyewear-jeeliz-tracking-canvas";
 // down from the top of that box the glasses' vertical center sits. Tuned
 // empirically -- adjust here if glasses consistently look too
 // big/small/high/low across test photos.
-const GLASSES_WIDTH_RATIO = 0.9;
-const GLASSES_VERTICAL_RATIO = 0.42;
+const GLASSES_WIDTH_RATIO = 1.15;
+const GLASSES_VERTICAL_RATIO = 0.58;
 const DETECTION_CONFIDENCE_THRESHOLD = 0.6;
 
 declare global {
