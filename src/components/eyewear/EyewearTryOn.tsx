@@ -183,8 +183,15 @@ export function EyewearTryOn({ product, onClose }: Props) {
           drawDot(rightPx, "blue");
           drawDot(nosePx, "lime");
           ctx.fillStyle = "yellow";
-          ctx.font = "20px sans-serif";
-          ctx.fillText(`landmarks: ${landmarks.length}`, 10, 30);
+          ctx.font = "18px monospace";
+          const lines = [
+            `landmarks: ${landmarks.length}`,
+            `canvas: ${canvas.width}x${canvas.height}  video: ${video.videoWidth}x${video.videoHeight}`,
+            `left(33)  norm=(${left.x.toFixed(3)}, ${left.y.toFixed(3)})  px=(${leftPx.x.toFixed(0)}, ${leftPx.y.toFixed(0)})`,
+            `right(263) norm=(${right.x.toFixed(3)}, ${right.y.toFixed(3)})  px=(${rightPx.x.toFixed(0)}, ${rightPx.y.toFixed(0)})`,
+            `nose(168) norm=(${nose.x.toFixed(3)}, ${nose.y.toFixed(3)})  px=(${nosePx.x.toFixed(0)}, ${nosePx.y.toFixed(0)})`,
+          ];
+          lines.forEach((line, i) => ctx.fillText(line, 10, 26 + i * 22));
           // --- END DEBUG OVERLAY ---
         }
       } catch (frameError) {
@@ -237,7 +244,16 @@ export function EyewearTryOn({ product, onClose }: Props) {
       </div>
 
       <div className="relative bg-black aspect-[4/3] max-h-[70vh]">
-        <video ref={videoRef} className="hidden" playsInline muted />
+        {/* `display: none` can make some browsers stop updating the video's
+            decoded frame, which the underlying WASM detector reads from
+            directly (separately from our own canvas draw). Keeping it laid
+            out but visually invisible avoids that. */}
+        <video
+          ref={videoRef}
+          playsInline
+          muted
+          style={{ position: "absolute", width: 1, height: 1, opacity: 0, pointerEvents: "none" }}
+        />
         <canvas ref={canvasRef} className="w-full h-full object-contain" style={{ transform: "scaleX(-1)" }} />
 
         {status !== "running" && (
