@@ -127,6 +127,12 @@ export async function SiteHeader() {
           <Link href="/tarifs" className="whitespace-nowrap hover:opacity-80 transition-opacity">
             Tarifs
           </Link>
+          <Link href="/essayage" className="whitespace-nowrap hover:opacity-80 transition-opacity">
+            Essayer des lunettes
+          </Link>
+          <Link href="/opticien" className="whitespace-nowrap hover:opacity-80 transition-opacity">
+            Espace opticien
+          </Link>
           {isAdmin && (
             <Link
               href="/admin/demandes"

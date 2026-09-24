@@ -189,6 +189,24 @@ export interface RenovationProject {
   updatedAt: string;
 }
 
+export type EyewearCategory = "optique" | "solaire";
+
+/** A pair of glasses added by an optician to the public try-on catalogue. */
+export interface EyewearProduct {
+  id: string;
+  opticianId: string;
+  brand: string;
+  name: string;
+  category: EyewearCategory;
+  price: number | null;
+  currency: Currency;
+  description: string;
+  imageUrl: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 /** Full aggregate used by the UI — everything needed to render a project page. */
 export interface ProjectDetail {
   project: RenovationProject;
