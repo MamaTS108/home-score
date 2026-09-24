@@ -52,27 +52,19 @@ export function EyewearTryOn({ product, onClose }: Props) {
           "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.0.1/wasm"
         );
 
-        // The GPU delegate is faster but unsupported on some browsers
-        // (notably Safari in several configurations), where it throws
-        // instead of falling back on its own -- so we try GPU first and
-        // retry with CPU if that fails.
+        // The GPU delegate relies on a WebGL context that several browsers
+        // (Safari in particular) fail to hand it correctly -- the failure
+        // happens deep inside the WASM runtime ("GLctx.activeTexture"),
+        // outside of what a JS try/catch around createFromOptions can
+        // reliably catch. CPU is slower per-frame but works everywhere, and
+        // is plenty fast for a single face at this resolution.
         const modelAssetPath =
           "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
-        let faceLandmarker;
-        try {
-          faceLandmarker = await FaceLandmarker.createFromOptions(filesetResolver, {
-            baseOptions: { modelAssetPath, delegate: "GPU" },
-            runningMode: "VIDEO",
-            numFaces: 1,
-          });
-        } catch (gpuError) {
-          console.warn("GPU delegate failed for face landmarker, retrying with CPU", gpuError);
-          faceLandmarker = await FaceLandmarker.createFromOptions(filesetResolver, {
-            baseOptions: { modelAssetPath, delegate: "CPU" },
-            runningMode: "VIDEO",
-            numFaces: 1,
-          });
-        }
+        const faceLandmarker = await FaceLandmarker.createFromOptions(filesetResolver, {
+          baseOptions: { modelAssetPath, delegate: "CPU" },
+          runningMode: "VIDEO",
+          numFaces: 1,
+        });
 
         if (cancelled) {
           faceLandmarker.close();
@@ -137,39 +129,50 @@ export function EyewearTryOn({ product, onClose }: Props) {
 
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      const result = landmarker.detectForVideo(video, performance.now());
-      const landmarks = result?.faceLandmarks?.[0];
-      const glassesImg = glassesImageRef.current;
+      try {
+        const result = landmarker.detectForVideo(video, performance.now());
+        const landmarks = result?.faceLandmarks?.[0];
+        const glassesImg = glassesImageRef.current;
 
-      if (landmarks && glassesImg && glassesImg.complete && glassesImg.naturalWidth > 0) {
-        const left = landmarks[LEFT_EYE_OUTER];
-        const right = landmarks[RIGHT_EYE_OUTER];
-        const nose = landmarks[NOSE_BRIDGE];
+        if (landmarks && glassesImg && glassesImg.complete && glassesImg.naturalWidth > 0) {
+          const left = landmarks[LEFT_EYE_OUTER];
+          const right = landmarks[RIGHT_EYE_OUTER];
+          const nose = landmarks[NOSE_BRIDGE];
 
-        const leftPx = { x: left.x * canvas.width, y: left.y * canvas.height };
-        const rightPx = { x: right.x * canvas.width, y: right.y * canvas.height };
-        const nosePx = { x: nose.x * canvas.width, y: nose.y * canvas.height };
+          const leftPx = { x: left.x * canvas.width, y: left.y * canvas.height };
+          const rightPx = { x: right.x * canvas.width, y: right.y * canvas.height };
+          const nosePx = { x: nose.x * canvas.width, y: nose.y * canvas.height };
 
-        const dx = rightPx.x - leftPx.x;
-        const dy = rightPx.y - leftPx.y;
-        const eyeDistance = Math.sqrt(dx * dx + dy * dy);
-        const angle = Math.atan2(dy, dx);
+          const dx = rightPx.x - leftPx.x;
+          const dy = rightPx.y - leftPx.y;
+          const eyeDistance = Math.sqrt(dx * dx + dy * dy);
+          const angle = Math.atan2(dy, dx);
 
-        const glassesWidth = eyeDistance * GLASSES_WIDTH_FACTOR;
-        const glassesHeight = glassesWidth * (glassesImg.naturalHeight / glassesImg.naturalWidth);
+          const glassesWidth = eyeDistance * GLASSES_WIDTH_FACTOR;
+          const glassesHeight = glassesWidth * (glassesImg.naturalHeight / glassesImg.naturalWidth);
 
-        const eyeMidX = (leftPx.x + rightPx.x) / 2;
-        const eyeMidY = (leftPx.y + rightPx.y) / 2;
-        // Blend the eye-corner midpoint with the nose bridge so the frame
-        // sits slightly lower, closer to where glasses actually rest.
-        const centerX = eyeMidX * 0.5 + nosePx.x * 0.5;
-        const centerY = eyeMidY * 0.45 + nosePx.y * 0.55;
+          const eyeMidX = (leftPx.x + rightPx.x) / 2;
+          const eyeMidY = (leftPx.y + rightPx.y) / 2;
+          // Blend the eye-corner midpoint with the nose bridge so the frame
+          // sits slightly lower, closer to where glasses actually rest.
+          const centerX = eyeMidX * 0.5 + nosePx.x * 0.5;
+          const centerY = eyeMidY * 0.45 + nosePx.y * 0.55;
 
-        ctx.save();
-        ctx.translate(centerX, centerY);
-        ctx.rotate(angle);
-        ctx.drawImage(glassesImg, -glassesWidth / 2, -glassesHeight / 2, glassesWidth, glassesHeight);
-        ctx.restore();
+          ctx.save();
+          ctx.translate(centerX, centerY);
+          ctx.rotate(angle);
+          ctx.drawImage(glassesImg, -glassesWidth / 2, -glassesHeight / 2, glassesWidth, glassesHeight);
+          ctx.restore();
+        }
+      } catch (frameError) {
+        // A runtime error from the WASM detector (e.g. a lost GPU/WebGL
+        // context) should stop the loop with a clear message instead of
+        // spamming the console on every animation frame.
+        console.error("Eyewear try-on: face detection failed mid-stream", frameError);
+        setStatus("error");
+        const detail = frameError instanceof Error ? frameError.message : String(frameError);
+        setErrorMessage(`L'essayage virtuel s'est interrompu (${detail}). Rechargez la page pour réessayer.`);
+        return;
       }
 
       rafRef.current = requestAnimationFrame(renderLoop);
