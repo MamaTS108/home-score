@@ -13,7 +13,11 @@ const NOSE_BRIDGE = 168;
 
 // Glasses frames are noticeably wider than the outer-eye-corner distance
 // (they extend out to the temples), so we scale the measured distance up.
-const GLASSES_WIDTH_FACTOR = 2.3;
+// Kept conservative: a tightly-cropped glasses photo (recommended to
+// opticians) will look right; a photo with extra padding around the frame
+// will still look oversized since we scale the whole image, padding
+// included.
+const GLASSES_WIDTH_FACTOR = 1.8;
 
 interface Props {
   product: EyewearProduct;
@@ -163,6 +167,25 @@ export function EyewearTryOn({ product, onClose }: Props) {
           ctx.rotate(angle);
           ctx.drawImage(glassesImg, -glassesWidth / 2, -glassesHeight / 2, glassesWidth, glassesHeight);
           ctx.restore();
+
+          // --- TEMPORARY DEBUG OVERLAY ---
+          // Shows exactly where the model thinks the eyes/nose are, so we
+          // can tell a detection problem (dots not on the eyes) apart from
+          // a drawing problem (dots on the eyes, glasses drawn wrong).
+          // Safe to remove once positioning is confirmed correct.
+          const drawDot = (p: { x: number; y: number }, color: string) => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 7, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+          };
+          drawDot(leftPx, "red");
+          drawDot(rightPx, "blue");
+          drawDot(nosePx, "lime");
+          ctx.fillStyle = "yellow";
+          ctx.font = "20px sans-serif";
+          ctx.fillText(`landmarks: ${landmarks.length}`, 10, 30);
+          // --- END DEBUG OVERLAY ---
         }
       } catch (frameError) {
         // A runtime error from the WASM detector (e.g. a lost GPU/WebGL
